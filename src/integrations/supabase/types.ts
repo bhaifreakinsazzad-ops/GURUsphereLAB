@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          donor_name: string | null
+          id: string
+          message: string | null
+          method: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          donor_name?: string | null
+          id?: string
+          message?: string | null
+          method: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          donor_name?: string | null
+          id?: string
+          message?: string | null
+          method?: string
+        }
+        Relationships: []
+      }
       memorial_notes: {
         Row: {
           created_at: string

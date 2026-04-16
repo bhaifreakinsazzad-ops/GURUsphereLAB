@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
-  { label: "Live Universe", href: "#classroom" },
-  { label: "Library", href: "#library" },
-  { label: "Exam Arena", href: "#exams" },
-  { label: "Knowledge Tree", href: "#knowledge-tree" },
-  { label: "Clubs", href: "#clubs" },
+  { label: "Research", href: "#research" },
+  { label: "Free Courses", href: "#library" },
+  { label: "Premium Tools", href: "#tools" },
+  { label: "Open Source", href: "#open-source" },
+  { label: "Community", href: "#clubs" },
 ];
 
 const Navbar = () => {
@@ -18,8 +18,8 @@ const Navbar = () => {
       <div className="mx-auto max-w-7xl section-padding py-4">
         <div className="glass-card rounded-2xl px-6 py-3 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gradient-green">GURU'sphere</span>
-            <span className="text-sm font-medium text-muted-foreground tracking-wide">LAB</span>
+            <span className="text-2xl font-bold text-gradient-gold">Hadi</span>
+            <span className="text-2xl font-bold text-gradient-green">Wishes</span>
           </a>
 
           {/* Desktop */}

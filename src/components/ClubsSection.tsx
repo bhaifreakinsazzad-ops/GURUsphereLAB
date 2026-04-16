@@ -24,15 +24,15 @@ const ClubsSection = () => {
         <ScrollReveal>
           <div className="text-center mb-12">
             <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-3">
-              Coming Soon
+              Community · Coming Soon
             </p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
-              Find your{" "}
-              <span className="text-gradient-green">tribe.</span>
+              Learn alone. Grow{" "}
+              <span className="text-gradient-green">together.</span>
             </h2>
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-lg">
-              Clubs are where passion meets community. Find people who geek out
-              about the same things you do — launching soon.
+              Discord, Telegram, study circles — find Bangladeshi students chasing
+              the same wishes you are. Launching soon.
             </p>
           </div>
         </ScrollReveal>

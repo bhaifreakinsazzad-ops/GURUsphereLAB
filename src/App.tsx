@@ -13,6 +13,10 @@ import Auth from "./pages/Auth.tsx";
 
 const ExamArena = lazy(() => import("./pages/ExamArena.tsx"));
 const HadiMeter = lazy(() => import("./pages/HadiMeter.tsx"));
+const ResearchArchive = lazy(() => import("./pages/ResearchArchive.tsx"));
+const TeamProjects = lazy(() => import("./pages/TeamProjects.tsx"));
+const Mentorship = lazy(() => import("./pages/Mentorship.tsx"));
+const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -39,6 +43,10 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/exam-arena" element={<Suspense fallback={<LoadingFallback />}><ExamArena /></Suspense>} />
               <Route path="/hadi-meter" element={<Suspense fallback={<LoadingFallback />}><HadiMeter /></Suspense>} />
+              <Route path="/research-archive" element={<Suspense fallback={<LoadingFallback />}><ResearchArchive /></Suspense>} />
+              <Route path="/team-projects" element={<Suspense fallback={<LoadingFallback />}><TeamProjects /></Suspense>} />
+              <Route path="/mentorship" element={<Suspense fallback={<LoadingFallback />}><Mentorship /></Suspense>} />
+              <Route path="/dashboard" element={<Suspense fallback={<LoadingFallback />}><Dashboard /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

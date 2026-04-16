@@ -5,11 +5,11 @@ import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
+  { label: "Legacy", href: "#legacy" },
   { label: "Research", href: "#research" },
   { label: "Free Courses", href: "#library" },
-  { label: "Premium Tools", href: "#tools" },
   { label: "Memorial", href: "#memorial" },
-  { label: "Submit", href: "#submit" },
+  { label: "Donate", href: "#donate" },
 ];
 
 const Navbar = () => {

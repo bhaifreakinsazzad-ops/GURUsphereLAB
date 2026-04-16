@@ -1,17 +1,20 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { label: "Research", href: "#research" },
   { label: "Free Courses", href: "#library" },
   { label: "Premium Tools", href: "#tools" },
-  { label: "Open Source", href: "#open-source" },
-  { label: "Community", href: "#clubs" },
+  { label: "Memorial", href: "#memorial" },
+  { label: "Submit", href: "#submit" },
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
@@ -23,7 +26,7 @@ const Navbar = () => {
           </a>
 
           {/* Desktop */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <a
                 key={item.href}
@@ -33,12 +36,28 @@ const Navbar = () => {
                 {item.label}
               </a>
             ))}
-            <a
-              href="#join"
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-[0.97] duration-150"
-            >
-              Join Free
-            </a>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
+                  <UserIcon size={14} /> {profile?.display_name ?? "you"}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="p-2 rounded-lg hover:bg-muted transition-colors"
+                  aria-label="Sign out"
+                  title="Sign out"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/auth"
+                className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-[0.97] duration-150"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -71,13 +90,22 @@ const Navbar = () => {
                   {item.label}
                 </a>
               ))}
-              <a
-                href="#join"
-                onClick={() => setOpen(false)}
-                className="block mt-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold text-center"
-              >
-                Join Free
-              </a>
+              {user ? (
+                <button
+                  onClick={() => { setOpen(false); signOut(); }}
+                  className="block w-full mt-2 px-5 py-3 rounded-xl text-sm font-semibold text-center bg-muted text-foreground"
+                >
+                  Sign out ({profile?.display_name})
+                </button>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setOpen(false)}
+                  className="block mt-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold text-center"
+                >
+                  Sign in
+                </Link>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

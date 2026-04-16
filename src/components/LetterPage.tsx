@@ -44,7 +44,10 @@ const LetterPage = ({
       >
         <div className="parchment-card p-8 md:p-10 relative">
           {/* Wax seal */}
-          <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full wax-seal flex items-center justify-center text-[8px] font-bold text-red-200/90 tracking-widest">
+          <div
+            className="absolute -top-3 -right-3 w-10 h-10 rounded-full wax-seal flex items-center justify-center text-[8px] font-bold tracking-widest"
+            style={{ color: "hsl(0 60% 90% / 0.9)" }}
+          >
             হাদী
           </div>
 

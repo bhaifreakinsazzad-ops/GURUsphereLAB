@@ -59,8 +59,8 @@ const Candle = ({ size = 80, className = "" }: CandleProps) => {
 
       {/* Wick */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 bg-zinc-900"
-        style={{ top: size * 0.7, width: 1.5, height: size * 0.08 }}
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{ top: size * 0.7, width: 1.5, height: size * 0.08, background: "hsl(220 50% 6%)" }}
       />
 
       {/* Candle body */}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Plus, ExternalLink, Tag, X } from "lucide-react";
+import { Search, Plus, ExternalLink, Tag, X, ArrowUp } from "lucide-react";
 import NebulaShell from "@/components/NebulaShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";

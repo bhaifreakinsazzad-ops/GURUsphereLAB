@@ -230,15 +230,18 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      {/* Wish of the Week — full width below */}
+      {/* Wish of the Week — desktop: floats above scroll cue; mobile: in flow below portrait */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 3.2 }}
-        className="absolute bottom-28 left-1/2 -translate-x-1/2 w-full max-w-2xl section-padding z-10"
+        className="hidden lg:block absolute bottom-28 left-1/2 -translate-x-1/2 w-full max-w-2xl section-padding z-10"
       >
         <WishOfTheWeek />
       </motion.div>
+      <div className="lg:hidden section-padding pb-24 -mt-4 relative z-10">
+        <WishOfTheWeek />
+      </div>
 
       {/* Scroll cue */}
       <motion.div

@@ -1,6 +1,8 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import LetterPage from "@/components/LetterPage";
+import LegacyTimelineSection from "@/components/LegacyTimelineSection";
+import DonationSection from "@/components/DonationSection";
 import ClassroomSection from "@/components/ClassroomSection";
 import ResearchHubSection from "@/components/ResearchHubSection";
 import LibrarySection from "@/components/LibrarySection";
@@ -19,6 +21,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <LegacyTimelineSection />
 
       <LetterPage
         bengaliQuote="যা পাইনি, সেটাই তোমাকে দিতে চাই — পৃথিবীর সেরা জ্ঞান, বিনামূল্যে।"
@@ -63,6 +66,7 @@ const Index = () => {
       <MemorialWallSection />
       <UniqueFeatures />
       <ClubsSection />
+      <DonationSection />
       <FooterSection />
     </div>
   );

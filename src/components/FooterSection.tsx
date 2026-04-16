@@ -2,6 +2,7 @@ import { useState } from "react";
 import ScrollReveal from "./ScrollReveal";
 import { toast } from "@/hooks/use-toast";
 import MemorialBadge from "./MemorialBadge";
+import Candle, { RisingParticles } from "./Candle";
 
 const FooterSection = () => {
   const [email, setEmail] = useState("");
@@ -23,45 +24,55 @@ const FooterSection = () => {
   };
 
   return (
-    <footer id="join" className="py-24 md:py-32 section-padding relative overflow-hidden">
-      <div className="absolute inset-0 hero-gradient opacity-95" />
+    <footer id="join" className="py-32 md:py-40 section-padding relative overflow-hidden">
+      <div className="absolute inset-0 hero-gradient" />
+      <RisingParticles count={20} />
 
       <div className="max-w-3xl mx-auto relative z-10 text-center">
         <ScrollReveal>
-          <div className="mb-6 flex justify-center">
-            <MemorialBadge variant="light" />
+          <div className="flex justify-center mb-8">
+            <Candle size={56} />
           </div>
 
-          <p className="bengali-text text-lg mb-4" style={{ color: "hsl(var(--pathshala-gold-light))" }}>
+          <div className="mb-6 flex justify-center">
+            <MemorialBadge />
+          </div>
+
+          <p className="bengali-text text-xl mb-4" style={{ color: "hsl(var(--candle-soft))" }}>
             শেখা শুরু করো — তাঁর স্বপ্ন বাঁচিয়ে রাখো
           </p>
           <h2
-            className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-6"
-            style={{ color: "hsl(var(--primary-foreground))" }}
+            className="text-4xl md:text-6xl tracking-tight leading-[1.05] mb-6 italic font-medium"
+            style={{ color: "hsl(var(--foreground))", fontFamily: "'Cormorant Garamond', serif" }}
           >
-            His wish. Your turn.
+            His wish.{" "}
+            <span className="handwritten not-italic text-gradient-candle">Your turn.</span>
           </h2>
-          <p className="text-lg mb-10 max-w-lg mx-auto leading-relaxed" style={{ color: "hsl(162 30% 65%)" }}>
+          <p className="text-lg mb-10 max-w-lg mx-auto leading-relaxed font-light" style={{ color: "hsl(42 22% 70%)" }}>
             Get every new free course, research portal, and premium tool we unlock —
             straight to your inbox. No spam. No fees. Just knowledge, freely given.
           </p>
 
-          <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+          <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto sans">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/10 text-sm placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-pathshala-gold/50 transition-shadow"
-              style={{ color: "hsl(var(--primary-foreground))" }}
+              placeholder="your@email.com"
+              className="flex-1 px-5 py-4 rounded-xl text-sm placeholder:text-white/25 focus:outline-none focus:ring-2 transition-shadow"
+              style={{
+                background: "hsl(var(--background) / 0.6)",
+                border: "1px solid hsl(var(--candle) / 0.25)",
+                color: "hsl(var(--foreground))",
+              }}
             />
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[0.97] shrink-0 disabled:opacity-60"
+              className="px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-300 active:scale-[0.97] shrink-0 disabled:opacity-60 glow-gold"
               style={{
-                background: "hsl(var(--pathshala-gold))",
-                color: "hsl(var(--pathshala-deep))",
+                background: "linear-gradient(135deg, hsl(var(--candle)), hsl(35 90% 50%))",
+                color: "hsl(220 50% 6%)",
               }}
             >
               {submitting ? "Joining..." : "Join Hadi Wishes"}
@@ -70,19 +81,22 @@ const FooterSection = () => {
         </ScrollReveal>
 
         <ScrollReveal delay={0.3}>
-          <div className="mt-20 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
+          <div
+            className="mt-20 pt-10 flex flex-col items-center gap-4"
+            style={{ borderTop: "1px solid hsl(var(--candle) / 0.15)" }}
+          >
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-gradient-gold">Hadi</span>
-              <span className="text-xl font-bold text-gradient-green">Wishes</span>
+              <span className="text-2xl font-bold text-gradient-gold italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Hadi</span>
+              <span className="text-2xl handwritten text-gradient-green">Wishes</span>
             </div>
             <p
-              className="bengali-text text-sm max-w-md"
-              style={{ color: "hsl(var(--pathshala-gold-light))" }}
+              className="bengali-text text-base max-w-md italic"
+              style={{ color: "hsl(var(--candle-soft) / 0.85)" }}
             >
               শহীদ ওসমান হাদীর স্মরণে — তাঁর স্বপ্ন, আমাদের পথ।
             </p>
-            <p className="text-xs" style={{ color: "hsl(162 15% 40%)" }}>
-              In loving memory of Shaheed Osman Hadi · Built for the curious of Bangladesh, free for the world.
+            <p className="text-xs sans tracking-wide" style={{ color: "hsl(42 15% 50%)" }}>
+              Born of grief. Built with love. Free, forever.
             </p>
           </div>
         </ScrollReveal>

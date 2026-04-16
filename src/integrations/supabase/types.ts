@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      memorial_notes: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resource_submissions: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          title: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          title: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          title?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_wishes: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          wish_key: string
+          wish_title: string
+          wish_type: string
+          wish_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          wish_key: string
+          wish_title: string
+          wish_type: string
+          wish_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          wish_key?: string
+          wish_title?: string
+          wish_type?: string
+          wish_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -58,7 +58,7 @@ const MemorialWallSection = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("memorial_notes").insert({ user_id: user.id, note: parsed.data });
+    const { error } = await supabase.from("memorial_notes").insert([{ user_id: user.id, note: parsed.data }]);
     setSubmitting(false);
     if (error) {
       toast({ title: "Couldn't post", description: error.message, variant: "destructive" });

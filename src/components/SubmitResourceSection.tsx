@@ -66,7 +66,10 @@ const SubmitResourceSection = () => {
     setSubmitting(true);
     const { error } = await supabase.from("resource_submissions").insert([{
       user_id: user.id,
-      ...parsed.data,
+      title: parsed.data.title,
+      url: parsed.data.url,
+      category: parsed.data.category,
+      description: parsed.data.description,
     }]);
     setSubmitting(false);
     if (error) {

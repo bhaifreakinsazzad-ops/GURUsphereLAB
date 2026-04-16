@@ -58,6 +58,13 @@
     --candle: 35 95% 62%;
     --candle-soft: 38 90% 75%;
 
+    /* Nebula functional theme tokens */
+    --nebula-navy: 222 60% 8%;
+    --nebula-navy-deep: 224 65% 5%;
+    --nebula-gold: 42 95% 62%;
+    --nebula-violet: 260 70% 60%;
+    --nebula-cyan: 190 80% 55%;
+
     --sidebar-background: 220 40% 5%;
     --sidebar-foreground: 42 25% 80%;
     --sidebar-primary: 42 85% 58%;
@@ -245,6 +252,42 @@
       0 0 0 1px hsl(0 60% 20%) inset,
       -2px -2px 6px hsl(0 0% 0% / 0.4) inset,
       2px 2px 6px hsl(0 70% 80% / 0.2) inset;
+  }
+
+  /* Nebula surface — for functional/dashboard pages */
+  .nebula-bg {
+    background:
+      radial-gradient(ellipse at 15% 0%, hsl(var(--nebula-violet) / 0.15) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 20%, hsl(var(--nebula-cyan) / 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 100%, hsl(var(--nebula-gold) / 0.1) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(var(--nebula-navy-deep)) 0%, hsl(var(--nebula-navy)) 100%);
+    min-height: 100vh;
+  }
+
+  .nebula-card {
+    background: linear-gradient(145deg, hsl(222 50% 12% / 0.6) 0%, hsl(224 60% 7% / 0.8) 100%);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid hsl(var(--nebula-gold) / 0.18);
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 0 hsl(var(--nebula-gold) / 0.1) inset,
+      0 20px 50px -25px hsl(220 80% 0% / 0.7),
+      0 0 30px -10px hsl(var(--nebula-violet) / 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .nebula-card:hover {
+    border-color: hsl(var(--nebula-gold) / 0.35);
+    box-shadow:
+      0 1px 0 hsl(var(--nebula-gold) / 0.15) inset,
+      0 25px 60px -25px hsl(220 80% 0% / 0.8),
+      0 0 40px -8px hsl(var(--nebula-gold) / 0.25);
+  }
+
+  .nebula-input {
+    @apply bg-background/60 border border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all;
   }
 
   /* Vertical scroll indicator */

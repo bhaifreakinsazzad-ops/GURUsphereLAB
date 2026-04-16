@@ -98,6 +98,20 @@ const FooterSection = () => {
             <p className="text-xs sans tracking-wide" style={{ color: "hsl(42 15% 50%)" }}>
               Born of grief. Built with love. Free, forever.
             </p>
+            <p className="text-xs sans tracking-wide mt-2" style={{ color: "hsl(42 15% 55%)" }}>
+              Powered by{" "}
+              <span className="font-semibold text-gradient-gold">Freakin Studio</span>
+              {" "}&amp; the love of{" "}
+              <a
+                href="https://BhaiSazzaD.online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-gradient-green hover:underline"
+              >
+                BhaiSazzaD.online
+              </a>
+              {" "}&amp; 200 Million others 🤍
+            </p>
           </div>
         </ScrollReveal>
       </div>

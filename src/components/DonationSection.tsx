@@ -19,10 +19,10 @@ interface Donation {
 
 const PRESETS = [100, 250, 500, 1000, 2500];
 const METHODS = [
-  { id: "bkash", label: "bKash", hint: "01XXXXXXXXX", icon: Smartphone, color: "hsl(330 80% 55%)" },
-  { id: "nagad", label: "Nagad", hint: "01XXXXXXXXX", icon: Smartphone, color: "hsl(20 90% 55%)" },
-  { id: "paypal", label: "PayPal", hint: "paypal.me/hadiwishes", icon: Globe, color: "hsl(220 80% 55%)" },
-  { id: "bmc", label: "Buy Me a Coffee", hint: "buymeacoffee.com/hadi", icon: Coffee, color: "hsl(45 95% 55%)" },
+  { id: "bkash", label: "bKash", hint: "01778307704 (Personal)", icon: Smartphone, color: "hsl(330 80% 55%)" },
+  { id: "nagad", label: "Nagad", hint: "01778307704 (Personal)", icon: Smartphone, color: "hsl(20 90% 55%)" },
+  { id: "paypal", label: "PayPal", hint: "Coming soon — use bKash for now", icon: Globe, color: "hsl(220 80% 55%)" },
+  { id: "bmc", label: "Buy Me a Coffee", hint: "Coming soon — use bKash for now", icon: Coffee, color: "hsl(45 95% 55%)" },
 ] as const;
 
 const DonationSection = () => {

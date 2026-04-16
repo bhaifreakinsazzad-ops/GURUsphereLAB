@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioProvider } from "@/contexts/AudioContext";
 import AudioToggle from "@/components/AudioToggle";
+import FloatingDonateCTA from "@/components/FloatingDonateCTA";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Auth from "./pages/Auth.tsx";
@@ -38,6 +39,7 @@ const App = () => (
         <AuthProvider>
           <AudioProvider>
             <AudioToggle />
+            <FloatingDonateCTA />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />

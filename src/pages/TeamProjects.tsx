@@ -72,9 +72,12 @@ const TeamProjects = () => {
     if (!user) { toast.error("Sign in first"); return; }
     const parsed = projectSchema.safeParse(form);
     if (!parsed.success) { toast.error(parsed.error.errors[0].message); return; }
-    const { error } = await supabase.from("team_projects").insert({
-      owner_id: user.id, ...parsed.data,
-    });
+    const { error } = await supabase.from("team_projects").insert([{
+      owner_id: user.id,
+      title: parsed.data.title,
+      description: parsed.data.description,
+      category: parsed.data.category,
+    }]);
     if (error) { toast.error(error.message); return; }
     toast.success("Project launched 🚀");
     setForm({ title: "", description: "", category: "Web Dev" });

@@ -192,7 +192,18 @@ const ResearchArchive = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((t) => (
             <motion.article key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="nebula-card p-5 flex flex-col">
-              <span className="text-xs uppercase tracking-wider text-primary/80 font-semibold mb-2">{t.category}</span>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <span className="text-xs uppercase tracking-wider text-primary/80 font-semibold">{t.category}</span>
+                <button
+                  onClick={() => upvote(t.id)}
+                  className="shrink-0 inline-flex flex-col items-center px-2.5 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all"
+                  title={user ? "Upvote" : "Sign in to upvote"}
+                  aria-label="Upvote"
+                >
+                  <ArrowUp size={14} strokeWidth={2.5} />
+                  <span className="text-xs font-bold leading-none mt-0.5">{t.upvotes}</span>
+                </button>
+              </div>
               <h3 className="text-lg font-bold mb-2 leading-snug">{t.title}</h3>
               <p className="text-sm text-muted-foreground line-clamp-4 flex-1">{t.abstract}</p>
               {t.tags && t.tags.length > 0 && (

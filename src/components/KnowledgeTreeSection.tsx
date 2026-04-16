@@ -23,15 +23,15 @@ const KnowledgeTreeSection = () => {
         <ScrollReveal>
           <div className="text-center mb-16">
             <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-3">
-              Your Journey
+              His Tree of Wishes
             </p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
-              Grow your{" "}
-              <span className="text-gradient-green">Knowledge Tree</span>
+              Every wish he had —{" "}
+              <span className="text-gradient-green">becomes a branch.</span>
             </h2>
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-lg">
-              Every lesson learned, every exam passed — your tree grows. 
-              Watch your roots deepen and branches spread as you learn.
+              Each lesson learned, each free resource claimed, each project shipped —
+              the tree grows. His wish, lived through you.
             </p>
           </div>
         </ScrollReveal>

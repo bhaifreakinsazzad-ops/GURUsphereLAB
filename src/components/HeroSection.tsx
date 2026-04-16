@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import heroTree from "@/assets/hero-tree.jpg";
+import MemorialBadge from "./MemorialBadge";
 
 const HeroSection = () => {
   return (
@@ -42,13 +43,22 @@ const HeroSection = () => {
       ))}
 
       <div className="relative z-10 text-center section-padding max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6 flex justify-center"
+        >
+          <MemorialBadge variant="light" />
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0, filter: "blur(4px)" }}
           animate={{ opacity: 1, filter: "blur(0px)" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="bengali-text text-pathshala-gold-light text-lg md:text-xl mb-4 tracking-wide"
         >
-          জ্ঞানই শক্তি — Knowledge is Power
+          যা সে চেয়েছিল — তোমার জন্য খোলা
         </motion.p>
 
         <motion.h1
@@ -58,9 +68,9 @@ const HeroSection = () => {
           className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-tight mb-6"
           style={{ color: "hsl(var(--primary-foreground))" }}
         >
-          The School That
+          The Wishes
           <br />
-          <span className="text-gradient-gold">Never Closes</span>
+          <span className="text-gradient-gold">He Left Behind.</span>
         </motion.h1>
 
         <motion.p
@@ -70,8 +80,8 @@ const HeroSection = () => {
           className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
           style={{ color: "hsl(162 30% 70%)" }}
         >
-          Free, world-class education for every curious mind. 
-          Live classrooms, an infinite library, and a learning experience that makes you wonder why school was ever boring.
+          Free research, free courses, free premium tools — everything Bangladesh's
+          curious students were told they couldn't afford. Open. Forever.
         </motion.p>
 
         <motion.div
@@ -81,14 +91,14 @@ const HeroSection = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
-            href="#classroom"
+            href="#research"
             className="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-base transition-all duration-200 active:scale-[0.97]"
             style={{
               background: "hsl(var(--pathshala-gold))",
               color: "hsl(var(--pathshala-deep))",
             }}
           >
-            Enter the Universe →
+            Claim His Wishes →
           </a>
           <a
             href="#library"
@@ -98,7 +108,7 @@ const HeroSection = () => {
               color: "hsl(162 30% 70%)",
             }}
           >
-            Explore Library
+            Browse Free Courses
           </a>
         </motion.div>
 
@@ -111,8 +121,8 @@ const HeroSection = () => {
         >
           {[
             { value: "100%", label: "Forever Free" },
-            { value: "∞", label: "Books & Resources" },
-            { value: "24/7", label: "Live Classrooms" },
+            { value: "৳0", label: "Curated for Bangladesh" },
+            { value: "∞", label: "Built on His Wish" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="text-2xl md:text-3xl font-bold text-gradient-gold">{stat.value}</div>

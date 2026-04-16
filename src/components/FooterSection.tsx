@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ScrollReveal from "./ScrollReveal";
 import { toast } from "@/hooks/use-toast";
+import MemorialBadge from "./MemorialBadge";
 
 const FooterSection = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const FooterSection = () => {
     }
     setSubmitting(true);
     setTimeout(() => {
-      toast({ title: "You're in! 🎉", description: "We'll notify you when we launch." });
+      toast({ title: "You're in. 🤍", description: "We'll send you new free courses & tools as we curate them." });
       setEmail("");
       setSubmitting(false);
     }, 600);
@@ -27,18 +28,22 @@ const FooterSection = () => {
 
       <div className="max-w-3xl mx-auto relative z-10 text-center">
         <ScrollReveal>
+          <div className="mb-6 flex justify-center">
+            <MemorialBadge variant="light" />
+          </div>
+
           <p className="bengali-text text-lg mb-4" style={{ color: "hsl(var(--pathshala-gold-light))" }}>
-            শেখা শুরু করো — Start Learning
+            শেখা শুরু করো — তাঁর স্বপ্ন বাঁচিয়ে রাখো
           </p>
           <h2
             className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-6"
             style={{ color: "hsl(var(--primary-foreground))" }}
           >
-            Your seat is waiting.
+            His wish. Your turn.
           </h2>
           <p className="text-lg mb-10 max-w-lg mx-auto leading-relaxed" style={{ color: "hsl(162 30% 65%)" }}>
-            Join thousands of curious learners worldwide.
-            No fees. No barriers. No catch. Just knowledge, freely given.
+            Get every new free course, research portal, and premium tool we unlock —
+            straight to your inbox. No spam. No fees. Just knowledge, freely given.
           </p>
 
           <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -59,19 +64,25 @@ const FooterSection = () => {
                 color: "hsl(var(--pathshala-deep))",
               }}
             >
-              {submitting ? "Joining..." : "Join GURU'sphere Lab"}
+              {submitting ? "Joining..." : "Join Hadi Wishes"}
             </button>
           </form>
         </ScrollReveal>
 
         <ScrollReveal delay={0.3}>
-          <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="mt-20 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-gradient-gold">GURU'sphere</span>
-              <span className="text-xs" style={{ color: "hsl(162 20% 45%)" }}>LAB</span>
+              <span className="text-xl font-bold text-gradient-gold">Hadi</span>
+              <span className="text-xl font-bold text-gradient-green">Wishes</span>
             </div>
+            <p
+              className="bengali-text text-sm max-w-md"
+              style={{ color: "hsl(var(--pathshala-gold-light))" }}
+            >
+              শহীদ ওসমান হাদীর স্মরণে — তাঁর স্বপ্ন, আমাদের পথ।
+            </p>
             <p className="text-xs" style={{ color: "hsl(162 15% 40%)" }}>
-              Born in Bangladesh, built for the curious everywhere.
+              In loving memory of Shaheed Osman Hadi · Built for the curious of Bangladesh, free for the world.
             </p>
           </div>
         </ScrollReveal>

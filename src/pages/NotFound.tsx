@@ -12,11 +12,11 @@ const NotFound = () => {
     <div className="flex min-h-screen items-center justify-center hero-gradient relative overflow-hidden">
       <div className="text-center relative z-10 section-padding">
         <p className="bengali-text text-lg mb-4" style={{ color: "hsl(var(--pathshala-gold-light))" }}>
-          পথ হারিয়ে গেছে
+          পথ হারিয়ে গেছে — কিন্তু স্বপ্ন বেঁচে আছে
         </p>
         <h1 className="text-7xl md:text-9xl font-bold text-gradient-gold mb-4">404</h1>
         <p className="text-lg mb-8 max-w-md mx-auto" style={{ color: "hsl(162 30% 65%)" }}>
-          This page doesn't exist — but your learning journey does.
+          This page isn't here — but Hadi's wishes are. Head back home and claim them.
         </p>
         <Link
           to="/"

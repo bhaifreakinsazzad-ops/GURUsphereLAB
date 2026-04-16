@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center hero-gradient">
     <div className="text-center">
-      <div className="text-3xl font-bold text-gradient-gold mb-2">GURU'sphere</div>
+      <div className="text-3xl font-bold mb-2"><span className="text-gradient-gold">Hadi</span> <span className="text-gradient-green">Wishes</span></div>
       <p className="text-sm" style={{ color: "hsl(162 20% 55%)" }}>Loading...</p>
     </div>
   </div>

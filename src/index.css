@@ -2,62 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 
+  /* DARK by default — Letter From Hadi vibe */
   :root {
-    --background: 150 10% 97%;
-    --foreground: 155 30% 10%;
+    --background: 220 40% 5%;
+    --foreground: 42 35% 92%;
 
-    --card: 150 8% 95%;
-    --card-foreground: 155 30% 10%;
+    --card: 222 35% 8%;
+    --card-foreground: 42 30% 90%;
 
-    --popover: 150 10% 97%;
-    --popover-foreground: 155 30% 10%;
+    --popover: 222 35% 8%;
+    --popover-foreground: 42 30% 90%;
 
-    --primary: 162 100% 21%;
-    --primary-foreground: 45 100% 97%;
+    --primary: 42 85% 58%;
+    --primary-foreground: 220 50% 6%;
 
-    --secondary: 45 80% 55%;
-    --secondary-foreground: 155 30% 10%;
+    --secondary: 220 30% 14%;
+    --secondary-foreground: 42 30% 88%;
 
-    --muted: 150 8% 90%;
-    --muted-foreground: 155 10% 45%;
+    --muted: 222 25% 12%;
+    --muted-foreground: 42 18% 62%;
 
-    --accent: 45 80% 55%;
-    --accent-foreground: 155 30% 10%;
+    --accent: 42 85% 58%;
+    --accent-foreground: 220 50% 6%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 12% 88%;
-    --input: 150 12% 88%;
-    --ring: 162 100% 21%;
+    --border: 222 25% 16%;
+    --input: 222 25% 14%;
+    --ring: 42 85% 58%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens */
-    --pathshala-green: 162 100% 21%;
-    --pathshala-green-light: 162 60% 35%;
-    --pathshala-gold: 42 85% 55%;
-    --pathshala-gold-light: 42 90% 70%;
-    --pathshala-cream: 40 40% 96%;
-    --pathshala-deep: 160 40% 8%;
+    /* Hadi tokens */
+    --pathshala-green: 162 70% 38%;
+    --pathshala-green-light: 162 60% 50%;
+    --pathshala-gold: 42 85% 58%;
+    --pathshala-gold-light: 42 90% 75%;
+    --pathshala-cream: 40 60% 92%;
+    --pathshala-deep: 220 50% 4%;
     --pathshala-emerald: 155 60% 30%;
-    --pathshala-warm: 25 30% 95%;
+    --pathshala-warm: 25 30% 15%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Parchment & candle tokens for the letter aesthetic */
+    --parchment: 38 55% 88%;
+    --parchment-deep: 32 40% 78%;
+    --ink: 220 50% 12%;
+    --candle: 35 95% 62%;
+    --candle-soft: 38 90% 75%;
+
+    --sidebar-background: 220 40% 5%;
+    --sidebar-foreground: 42 25% 80%;
+    --sidebar-primary: 42 85% 58%;
+    --sidebar-primary-foreground: 220 50% 6%;
+    --sidebar-accent: 222 25% 12%;
+    --sidebar-accent-foreground: 42 30% 88%;
+    --sidebar-border: 222 25% 16%;
+    --sidebar-ring: 42 85% 58%;
   }
 }
 
@@ -68,12 +76,18 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Cormorant Garamond', 'Space Grotesk', serif;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, hsl(42 80% 20% / 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, hsl(162 60% 18% / 0.15) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 50%, hsl(220 40% 8% / 1) 0%, hsl(var(--background)) 100%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+    font-family: 'Cormorant Garamond', serif;
     text-wrap: balance;
+    letter-spacing: -0.01em;
   }
 
   p {
@@ -84,39 +98,104 @@
 
 @layer components {
   .bengali-text {
-    font-family: 'Noto Sans Bengali', sans-serif;
+    font-family: 'Noto Serif Bengali', 'Noto Sans Bengali', sans-serif;
+    font-weight: 500;
+  }
+
+  .handwritten {
+    font-family: 'Caveat', cursive;
+    letter-spacing: 0.005em;
+  }
+
+  .sans {
+    font-family: 'Space Grotesk', sans-serif;
   }
 
   .section-padding {
     @apply px-6 md:px-12 lg:px-24;
   }
 
+  /* Glass: now warm, candle-lit */
   .glass-card {
-    @apply bg-white/60 backdrop-blur-md border border-white/30;
-    box-shadow: 
-      0 4px 24px -4px hsla(var(--pathshala-green), 0.08),
-      0 1px 2px hsla(var(--pathshala-deep), 0.04);
+    background: linear-gradient(
+      145deg,
+      hsl(222 30% 11% / 0.7) 0%,
+      hsl(220 35% 7% / 0.85) 100%
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid hsl(42 50% 50% / 0.12);
+    box-shadow:
+      0 1px 0 hsl(42 80% 70% / 0.08) inset,
+      0 30px 60px -30px hsl(220 50% 0% / 0.6),
+      0 8px 24px -12px hsl(42 80% 30% / 0.15);
+  }
+
+  /* Parchment card — the "letter" feel */
+  .parchment-card {
+    position: relative;
+    background:
+      linear-gradient(135deg, hsl(38 55% 90%) 0%, hsl(34 45% 82%) 100%);
+    color: hsl(var(--ink));
+    border-radius: 2px;
+    box-shadow:
+      0 1px 0 hsl(40 80% 95% / 0.6) inset,
+      0 -1px 0 hsl(30 30% 60% / 0.3) inset,
+      0 25px 50px -20px hsl(220 50% 0% / 0.55),
+      0 12px 30px -15px hsl(42 80% 30% / 0.25);
+    transform: perspective(1200px) rotateX(0.5deg);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  }
+
+  .parchment-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(ellipse at 30% 20%, hsl(35 50% 70% / 0.25), transparent 50%),
+      radial-gradient(ellipse at 70% 80%, hsl(28 45% 65% / 0.2), transparent 50%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .parchment-card:hover {
+    transform: perspective(1200px) rotateX(0deg) translateY(-4px);
+    box-shadow:
+      0 1px 0 hsl(40 80% 95% / 0.6) inset,
+      0 -1px 0 hsl(30 30% 60% / 0.3) inset,
+      0 35px 70px -20px hsl(220 50% 0% / 0.65),
+      0 0 60px -10px hsl(var(--candle) / 0.25);
   }
 
   .glow-green {
-    box-shadow: 
-      0 0 40px -8px hsla(var(--pathshala-green), 0.3),
-      0 0 80px -16px hsla(var(--pathshala-green), 0.15);
+    box-shadow:
+      0 0 40px -8px hsl(var(--pathshala-green) / 0.4),
+      0 0 80px -16px hsl(var(--pathshala-green) / 0.2);
   }
 
   .glow-gold {
-    box-shadow: 
-      0 0 40px -8px hsla(var(--pathshala-gold), 0.3),
-      0 0 80px -16px hsla(var(--pathshala-gold), 0.15);
+    box-shadow:
+      0 0 50px -10px hsl(var(--candle) / 0.5),
+      0 0 100px -20px hsl(var(--candle) / 0.25);
+  }
+
+  .glow-candle {
+    box-shadow:
+      0 0 30px hsl(var(--candle) / 0.6),
+      0 0 60px hsl(var(--candle) / 0.4),
+      0 0 120px hsl(var(--candle) / 0.2);
   }
 
   .feature-card {
-    @apply glass-card rounded-2xl p-8 transition-[box-shadow,transform] duration-300 ease-out;
+    @apply glass-card rounded-2xl p-8 transition-[box-shadow,transform] duration-500 ease-out;
+    transform-style: preserve-3d;
   }
 
   .feature-card:hover {
-    @apply glow-green;
-    transform: translateY(-2px);
+    @apply glow-gold;
+    transform: translateY(-4px) perspective(1000px) rotateX(1deg);
+    border-color: hsl(42 80% 60% / 0.3);
   }
 
   .feature-card:active {
@@ -127,8 +206,8 @@
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(
       135deg,
-      hsl(var(--pathshala-green)) 0%,
-      hsl(var(--pathshala-emerald)) 100%
+      hsl(var(--pathshala-green-light)) 0%,
+      hsl(var(--pathshala-green)) 100%
     );
   }
 
@@ -136,18 +215,47 @@
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(
       135deg,
-      hsl(var(--pathshala-gold)) 0%,
+      hsl(var(--candle)) 0%,
       hsl(var(--pathshala-gold-light)) 100%
     );
   }
 
-  .hero-gradient {
-    background: linear-gradient(
+  .text-gradient-candle {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
       180deg,
-      hsl(var(--pathshala-deep)) 0%,
-      hsl(162 50% 12%) 50%,
-      hsl(var(--pathshala-green)) 100%
+      hsl(45 95% 80%) 0%,
+      hsl(35 100% 60%) 60%,
+      hsl(20 90% 50%) 100%
     );
+  }
+
+  .hero-gradient {
+    background:
+      radial-gradient(ellipse at 50% 30%, hsl(35 70% 25% / 0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 80%, hsl(162 50% 15% / 0.3) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(220 50% 4%) 0%, hsl(220 45% 7%) 50%, hsl(220 40% 5%) 100%);
+  }
+
+  /* Letter wax seal */
+  .wax-seal {
+    background: radial-gradient(circle at 35% 35%, hsl(0 75% 55%), hsl(0 70% 35%) 60%, hsl(0 75% 25%));
+    box-shadow:
+      0 2px 4px hsl(0 0% 0% / 0.5),
+      0 0 0 1px hsl(0 60% 20%) inset,
+      -2px -2px 6px hsl(0 0% 0% / 0.4) inset,
+      2px 2px 6px hsl(0 70% 80% / 0.2) inset;
+  }
+
+  /* Vertical scroll indicator */
+  .vignette {
+    position: relative;
+  }
+  .vignette::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, hsl(220 50% 4% / 0.7) 100%);
+    pointer-events: none;
   }
 }
 
@@ -163,6 +271,20 @@
   .animate-glow {
     animation: glow 3s ease-in-out infinite;
   }
+
+  .animate-flicker {
+    animation: flicker 3.5s ease-in-out infinite;
+  }
+
+  .animate-rise {
+    animation: rise 8s ease-in-out infinite;
+  }
+
+  /* 3D tilt helper */
+  .tilt-on-scroll {
+    transform-style: preserve-3d;
+    perspective: 1200px;
+  }
 }
 
 @keyframes float {
@@ -177,5 +299,20 @@
 
 @keyframes glow {
   0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.2); }
+  50% { filter: brightness(1.25); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; filter: brightness(1) blur(0px); transform: scale(1); }
+  20% { opacity: 0.92; filter: brightness(0.92) blur(0.4px); transform: scale(0.99); }
+  45% { opacity: 1; filter: brightness(1.15); transform: scale(1.01); }
+  70% { opacity: 0.95; filter: brightness(0.95); transform: scale(1); }
+  85% { opacity: 1.0; filter: brightness(1.1); transform: scale(1.005); }
+}
+
+@keyframes rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-200px) translateX(20px); opacity: 0; }
 }

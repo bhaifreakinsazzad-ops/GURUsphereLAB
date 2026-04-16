@@ -64,10 +64,10 @@ const SubmitResourceSection = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("resource_submissions").insert({
+    const { error } = await supabase.from("resource_submissions").insert([{
       user_id: user.id,
       ...parsed.data,
-    });
+    }]);
     setSubmitting(false);
     if (error) {
       toast({ title: "Couldn't submit", description: error.message, variant: "destructive" });

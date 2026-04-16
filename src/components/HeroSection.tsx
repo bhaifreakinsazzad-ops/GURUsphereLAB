@@ -227,10 +227,15 @@ const HeroSection = () => {
               হাদী
             </motion.div>
           </motion.div>
+
+          {/* Mobile-only inline Wish (avoids overlap with hero text) */}
+          <div className="lg:hidden mt-10">
+            <WishOfTheWeek />
+          </div>
         </motion.div>
       </div>
 
-      {/* Wish of the Week — desktop: floats above scroll cue; mobile: in flow below portrait */}
+      {/* Wish of the Week — desktop floating overlay */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -239,9 +244,6 @@ const HeroSection = () => {
       >
         <WishOfTheWeek />
       </motion.div>
-      <div className="lg:hidden section-padding pb-24 -mt-4 relative z-10">
-        <WishOfTheWeek />
-      </div>
 
       {/* Scroll cue */}
       <motion.div

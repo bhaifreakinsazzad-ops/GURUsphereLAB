@@ -361,6 +361,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_research_upvote: {
+        Args: { _topic_id: string }
+        Returns: number
+      }
+      promote_to_admin: { Args: { _email: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "mentor" | "student"

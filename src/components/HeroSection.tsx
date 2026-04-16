@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import heroTree from "@/assets/hero-tree.jpg";
 import MemorialBadge from "./MemorialBadge";
+import WishOfTheWeek from "./WishOfTheWeek";
 
 const HeroSection = () => {
   return (
@@ -111,6 +112,11 @@ const HeroSection = () => {
             Browse Free Courses
           </a>
         </motion.div>
+
+        {/* Wish of the Week */}
+        <div className="mt-10">
+          <WishOfTheWeek />
+        </div>
 
         {/* Stats */}
         <motion.div

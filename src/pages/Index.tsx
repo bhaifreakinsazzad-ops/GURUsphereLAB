@@ -7,6 +7,8 @@ import PremiumFreeToolsSection from "@/components/PremiumFreeToolsSection";
 import ExamSection from "@/components/ExamSection";
 import KnowledgeTreeSection from "@/components/KnowledgeTreeSection";
 import OpenSourceSection from "@/components/OpenSourceSection";
+import SubmitResourceSection from "@/components/SubmitResourceSection";
+import MemorialWallSection from "@/components/MemorialWallSection";
 import UniqueFeatures from "@/components/UniqueFeatures";
 import ClubsSection from "@/components/ClubsSection";
 import FooterSection from "@/components/FooterSection";
@@ -23,6 +25,8 @@ const Index = () => {
       <ExamSection />
       <KnowledgeTreeSection />
       <OpenSourceSection />
+      <SubmitResourceSection />
+      <MemorialWallSection />
       <UniqueFeatures />
       <ClubsSection />
       <FooterSection />

@@ -52,7 +52,48 @@ const ResearchArchive = () => {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    // Realtime — broadcast upvote count changes to every viewer
+    const channel = supabase
+      .channel("research_topics_changes")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "research_topics" },
+        (payload) => {
+          const updated = payload.new as Topic;
+          setTopics((prev) => prev.map((t) => (t.id === updated.id ? { ...t, upvotes: updated.upvotes } : t)));
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "research_topics" },
+        () => load()
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "research_topics" },
+        (payload) => {
+          setTopics((prev) => prev.filter((t) => t.id !== (payload.old as Topic).id));
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const upvote = async (id: string) => {
+    if (!user) { toast.error("Sign in to upvote"); return; }
+    // Optimistic
+    setTopics((prev) => prev.map((t) => (t.id === id ? { ...t, upvotes: t.upvotes + 1 } : t)));
+    const { error } = await supabase.rpc("increment_research_upvote", { _topic_id: id });
+    if (error) {
+      toast.error(error.message);
+      // Rollback
+      setTopics((prev) => prev.map((t) => (t.id === id ? { ...t, upvotes: Math.max(0, t.upvotes - 1) } : t)));
+    }
+  };
 
   const filtered = useMemo(() => {
     return topics.filter((t) => {

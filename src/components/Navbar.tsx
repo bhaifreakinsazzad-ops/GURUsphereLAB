@@ -5,11 +5,11 @@ import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
-  { label: "Legacy", href: "#legacy" },
-  { label: "Research", href: "#research" },
-  { label: "Free Courses", href: "#library" },
-  { label: "Memorial", href: "#memorial" },
-  { label: "Donate", href: "#donate" },
+  { label: "Research", href: "/research-archive", route: true },
+  { label: "Projects", href: "/team-projects", route: true },
+  { label: "Mentors", href: "/mentorship", route: true },
+  { label: "Memorial", href: "/#memorial", route: false },
+  { label: "Donate", href: "/#donate", route: false },
 ];
 
 const Navbar = () => {
@@ -28,14 +28,29 @@ const Navbar = () => {
           {/* Desktop */}
           <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {item.label}
-              </a>
+              item.route ? (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {item.label}
+                </a>
+              )
             ))}
+            {user && (
+              <Link to="/dashboard" className="text-sm font-medium text-primary hover:text-primary/80">
+                Dashboard
+              </Link>
+            )}
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
@@ -81,15 +96,31 @@ const Navbar = () => {
               className="glass-card rounded-2xl mt-2 p-4 md:hidden"
             >
               {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-3 px-4 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
-                >
-                  {item.label}
-                </a>
+                item.route ? (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setOpen(false)}
+                    className="block py-3 px-4 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="block py-3 px-4 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                )
               ))}
+              {user && (
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 px-4 text-sm font-semibold text-primary rounded-xl">
+                  Dashboard
+                </Link>
+              )}
               {user ? (
                 <button
                   onClick={() => { setOpen(false); signOut(); }}

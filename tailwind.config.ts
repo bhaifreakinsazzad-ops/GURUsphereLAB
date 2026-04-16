@@ -71,6 +71,13 @@ export default {
           emerald: "hsl(var(--pathshala-emerald))",
           warm: "hsl(var(--pathshala-warm))",
         },
+        nebula: {
+          navy: "hsl(var(--nebula-navy))",
+          "navy-deep": "hsl(var(--nebula-navy-deep))",
+          gold: "hsl(var(--nebula-gold))",
+          violet: "hsl(var(--nebula-violet))",
+          cyan: "hsl(var(--nebula-cyan))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -58,6 +58,11 @@
     --candle: 35 95% 62%;
     --candle-soft: 38 90% 75%;
 
+    /* Bangladesh-inspired muted red accent (per Visual Design Reference) */
+    --hadi-red: 358 65% 48%;
+    --hadi-red-soft: 358 70% 62%;
+    --hadi-red-deep: 358 70% 32%;
+
     /* Nebula functional theme tokens */
     --nebula-navy: 222 60% 8%;
     --nebula-navy-deep: 224 65% 5%;
@@ -235,6 +240,21 @@
       hsl(35 100% 60%) 60%,
       hsl(20 90% 50%) 100%
     );
+  }
+
+  .text-gradient-red {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--hadi-red-soft)) 0%,
+      hsl(var(--hadi-red)) 100%
+    );
+  }
+
+  .glow-red {
+    box-shadow:
+      0 0 40px -8px hsl(var(--hadi-red) / 0.4),
+      0 0 80px -16px hsl(var(--hadi-red) / 0.2);
   }
 
   .hero-gradient {

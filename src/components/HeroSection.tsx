@@ -43,10 +43,26 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen overflow-hidden flex items-center justify-center pt-24 pb-12">
-      {/* Layer 1: Deep night gradient */}
-      <div className="absolute inset-0 hero-gradient" />
+      {/* Layer 0: Premium cinematic banner backdrop */}
+      <div className="absolute inset-0">
+        <img
+          src={heroBanner}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover opacity-30"
+          loading="eager"
+          decoding="async"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(ellipse at 50% 40%, hsl(220 50% 4% / 0.55) 0%, hsl(220 50% 4% / 0.92) 75%, hsl(220 50% 4%) 100%)" }}
+        />
+      </div>
 
-      {/* Layer 2: ornamental light beams */}
+      {/* Layer 1: Deep night gradient */}
+      <div className="absolute inset-0 hero-gradient opacity-70" />
+
+      {/* Layer 2: ornamental light beams + Bangladesh red accent ribbon */}
       <motion.div
         style={{ y: ornamentY }}
         className="absolute inset-0 pointer-events-none"
@@ -57,6 +73,13 @@ const HeroSection = () => {
           style={{
             background: "radial-gradient(ellipse at center, hsl(var(--candle) / 0.18) 0%, transparent 65%)",
             filter: "blur(40px)",
+          }}
+        />
+        <div
+          className="absolute top-1/3 right-0 w-[55%] h-[40%]"
+          style={{
+            background: "radial-gradient(ellipse at right center, hsl(var(--hadi-red) / 0.18) 0%, transparent 70%)",
+            filter: "blur(60px)",
           }}
         />
       </motion.div>
@@ -155,8 +178,8 @@ const HeroSection = () => {
             <a
               href="#donate"
               onMouseEnter={playSpark}
-              className="inline-flex items-center justify-center px-7 py-4 rounded-xl font-semibold text-base border transition-all duration-300 active:scale-[0.97] sans hover:bg-white/5"
-              style={{ borderColor: "hsl(var(--candle) / 0.4)", color: "hsl(var(--candle-soft))" }}
+              className="inline-flex items-center justify-center px-7 py-4 rounded-xl font-semibold text-base transition-all duration-300 active:scale-[0.97] sans glow-red"
+              style={{ background: "linear-gradient(135deg, hsl(var(--hadi-red-soft)), hsl(var(--hadi-red)))", color: "hsl(0 0% 100%)" }}
             >
               Keep his light burning ♥
             </a>

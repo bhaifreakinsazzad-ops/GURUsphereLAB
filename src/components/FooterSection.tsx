@@ -106,11 +106,12 @@ const FooterSection = () => {
                 href="https://BhaiSazzaD.online"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-gradient-green hover:underline"
+                className="font-semibold text-gradient-red hover:underline"
               >
                 BhaiSazzaD.online
               </a>
-              {" "}&amp; 200 Million others 🤍
+              {" "}&amp; 200 Million others{" "}
+              <span style={{ color: "hsl(var(--hadi-red-soft))" }}>♥</span>
             </p>
           </div>
         </ScrollReveal>

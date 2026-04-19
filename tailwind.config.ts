@@ -78,6 +78,11 @@ export default {
           violet: "hsl(var(--nebula-violet))",
           cyan: "hsl(var(--nebula-cyan))",
         },
+        hadi: {
+          red: "hsl(var(--hadi-red))",
+          "red-soft": "hsl(var(--hadi-red-soft))",
+          "red-deep": "hsl(var(--hadi-red-deep))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

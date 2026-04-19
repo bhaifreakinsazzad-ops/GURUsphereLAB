@@ -264,14 +264,14 @@
       linear-gradient(180deg, hsl(220 50% 4%) 0%, hsl(220 45% 7%) 50%, hsl(220 40% 5%) 100%);
   }
 
-  /* Letter wax seal */
+  /* Letter wax seal — Bangladesh deep red */
   .wax-seal {
-    background: radial-gradient(circle at 35% 35%, hsl(0 75% 55%), hsl(0 70% 35%) 60%, hsl(0 75% 25%));
+    background: radial-gradient(circle at 35% 35%, hsl(var(--hadi-red-soft)), hsl(var(--hadi-red)) 60%, hsl(var(--hadi-red-deep)));
     box-shadow:
       0 2px 4px hsl(0 0% 0% / 0.5),
-      0 0 0 1px hsl(0 60% 20%) inset,
+      0 0 0 1px hsl(var(--hadi-red-deep)) inset,
       -2px -2px 6px hsl(0 0% 0% / 0.4) inset,
-      2px 2px 6px hsl(0 70% 80% / 0.2) inset;
+      2px 2px 6px hsl(var(--hadi-red-soft) / 0.35) inset;
   }
 
   /* Nebula surface — for functional/dashboard pages */

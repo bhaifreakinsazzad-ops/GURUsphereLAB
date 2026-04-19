@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import hadiPortrait from "@/assets/hadi-portrait-hero.png";
+import heroBanner from "@/assets/hero-banner-premium.jpg";
 import Candle, { RisingParticles } from "./Candle";
 import MemorialBadge from "./MemorialBadge";
 import WishOfTheWeek from "./WishOfTheWeek";

@@ -4,10 +4,11 @@ import {
   Trophy, Zap, Crown, Shield, Flame, Star, Target, Award,
   Clock, Users, ChevronRight, ArrowLeft, Check, X as XIcon,
   Medal, Swords, TrendingUp, Brain, BookOpen, Code, Globe,
-  Atom, Calculator, Palette, Music, History
+  Atom, Calculator, Palette, Music, History, GraduationCap, Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
+import CertificatePreview from "@/components/CertificatePreview";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [
@@ -126,17 +127,25 @@ const ExamArena = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [practiceMode, setPracticeMode] = useState(false);
+  const [activePractice, setActivePractice] = useState(false);
+  const [showCertificate, setShowCertificate] = useState(false);
 
   const questions = selectedCategory ? getQuestionsForCategory(selectedCategory) : SAMPLE_QUESTIONS_FALLBACK;
+  const activeCategoryMeta = CATEGORIES.find((c) => c.id === selectedCategory);
+  // Practice earns half XP and does not affect ranking
+  const xpPerCorrect = activePractice ? 25 : 50;
 
   const startExam = (catId: string) => {
     setSelectedCategory(catId);
+    setActivePractice(practiceMode);
     setActiveView("exam");
     setCurrentQ(0);
     setSelectedAnswer(null);
     setShowResult(false);
     setScore(0);
     setAnswered(0);
+    setShowCertificate(false);
   };
 
   const handleAnswer = (idx: number) => {
@@ -160,6 +169,7 @@ const ExamArena = () => {
   const exitExam = () => {
     setActiveView("home");
     setSelectedCategory(null);
+    setShowCertificate(false);
   };
 
   return (
@@ -286,13 +296,49 @@ const ExamArena = () => {
             <section className="pb-16 md:pb-24 section-padding">
               <div className="max-w-5xl mx-auto">
                 <ScrollReveal>
-                  <div className="text-center mb-10">
+                  <div className="text-center mb-6">
                     <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-2">
                       Choose Your Battlefield
                     </p>
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                       Pick a subject. Face the truth.
                     </h2>
+                  </div>
+                </ScrollReveal>
+
+                {/* Practice mode toggle */}
+                <ScrollReveal>
+                  <div className="max-w-md mx-auto mb-10 feature-card !p-4 flex items-center gap-4">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: "hsl(var(--pathshala-emerald) / 0.15)" }}
+                    >
+                      <GraduationCap size={18} className="text-pathshala-emerald" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-foreground flex items-center gap-2">
+                        Practice Mode
+                        {practiceMode && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-pathshala-emerald/20 text-pathshala-emerald">ON</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        No ranking impact · Half XP · Try freely
+                      </p>
+                    </div>
+                    <button
+                      role="switch"
+                      aria-checked={practiceMode}
+                      onClick={() => setPracticeMode((p) => !p)}
+                      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${
+                        practiceMode ? "bg-pathshala-emerald" : "bg-muted"
+                      }`}
+                    >
+                      <span
+                        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-background shadow transition-transform"
+                        style={{ transform: practiceMode ? "translateX(24px)" : "translateX(0)" }}
+                      />
+                    </button>
                   </div>
                 </ScrollReveal>
 
@@ -498,7 +544,7 @@ const ExamArena = () => {
           >
             <div className="max-w-2xl mx-auto">
               {/* Exam Header */}
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={exitExam}
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors active:scale-95"
@@ -510,10 +556,21 @@ const ExamArena = () => {
                     {currentQ + 1}/{questions.length}
                   </span>
                   <span className="flex items-center gap-1.5 font-semibold text-pathshala-gold tabular-nums">
-                    <Zap size={14} /> {score * 50} XP
+                    <Zap size={14} /> {score * xpPerCorrect} XP
                   </span>
                 </div>
               </div>
+
+              {/* Practice mode banner */}
+              {activePractice && (
+                <div className="mb-6 flex items-center gap-3 px-4 py-2.5 rounded-xl border border-pathshala-emerald/30 bg-pathshala-emerald/10">
+                  <Sparkles size={16} className="text-pathshala-emerald shrink-0" />
+                  <p className="text-xs text-foreground">
+                    <strong className="text-pathshala-emerald">Practice round</strong>
+                    <span className="text-muted-foreground"> · No ranking impact · Earning {xpPerCorrect} XP per correct answer</span>
+                  </p>
+                </div>
+              )}
 
               {/* Progress bar */}
               <div className="w-full h-1.5 bg-muted rounded-full mb-10 overflow-hidden">
@@ -594,7 +651,7 @@ const ExamArena = () => {
                             <Zap size={16} className="text-pathshala-emerald" />
                           </div>
                           <div>
-                            <p className="font-semibold text-sm text-foreground">+50 XP — Correct!</p>
+                            <p className="font-semibold text-sm text-foreground">+{xpPerCorrect} XP — Correct!</p>
                             <p className="text-xs text-muted-foreground">You know your stuff.</p>
                           </div>
                         </div>
@@ -624,34 +681,72 @@ const ExamArena = () => {
                           Next Question →
                         </button>
                       ) : (
-                        <div className="mt-6 text-center">
-                          <div className="feature-card !p-8">
+                        <div className="mt-6">
+                          <div className="feature-card !p-8 text-center">
                             <Trophy size={36} className="mx-auto mb-3 text-pathshala-gold" />
-                            <h3 className="text-xl font-bold text-foreground mb-1">Exam Complete</h3>
+                            <h3 className="text-xl font-bold text-foreground mb-1">
+                              {activePractice ? "Practice Round Complete" : "Exam Complete"}
+                            </h3>
                             <p className="text-3xl font-bold text-gradient-gold tabular-nums mb-1">
                               {score}/{questions.length}
                             </p>
-                            <p className="text-sm text-muted-foreground mb-4">
-                              You earned <strong className="text-pathshala-gold">{score * 50} XP</strong>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              You earned <strong className="text-pathshala-gold">{score * xpPerCorrect} XP</strong>
+                              {activePractice && (
+                                <span className="block text-xs mt-1 text-pathshala-emerald">
+                                  Practice mode — ranking unaffected
+                                </span>
+                              )}
                             </p>
-                            <div className="flex gap-3">
-                              <button
-                                onClick={exitExam}
-                                className="flex-1 py-3 rounded-xl border-2 border-border/60 font-semibold text-sm text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
-                              >
-                                Back to Arena
-                              </button>
-                              <button
-                                onClick={() => startExam(selectedCategory || "")}
-                                className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
-                                style={{
-                                  background: "hsl(var(--pathshala-gold))",
-                                  color: "hsl(var(--pathshala-deep))",
-                                }}
-                              >
-                                Retry
-                              </button>
-                            </div>
+                            <p className="text-xs text-muted-foreground mb-5">
+                              Rank tier: <strong className="text-foreground">{getRank(score * xpPerCorrect).title}</strong> {getRank(score * xpPerCorrect).icon}
+                            </p>
+
+                            {!showCertificate ? (
+                              <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                  onClick={exitExam}
+                                  className="flex-1 py-3 rounded-xl border-2 border-border/60 font-semibold text-sm text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
+                                >
+                                  Back to Arena
+                                </button>
+                                <button
+                                  onClick={() => startExam(selectedCategory || "")}
+                                  className="flex-1 py-3 rounded-xl border-2 border-pathshala-gold/40 font-semibold text-sm text-foreground hover:bg-pathshala-gold/10 transition-colors active:scale-[0.97]"
+                                >
+                                  Retry
+                                </button>
+                                <button
+                                  onClick={() => setShowCertificate(true)}
+                                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
+                                  style={{
+                                    background: "hsl(var(--pathshala-gold))",
+                                    color: "hsl(var(--pathshala-deep))",
+                                  }}
+                                >
+                                  <Award size={14} /> Get Certificate
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="text-left mt-2">
+                                <CertificatePreview
+                                  data={{
+                                    name: "",
+                                    subject: activeCategoryMeta?.label || "General Knowledge",
+                                    score,
+                                    total: questions.length,
+                                    rankTitle: getRank(score * xpPerCorrect).title,
+                                    practice: activePractice,
+                                  }}
+                                />
+                                <button
+                                  onClick={() => setShowCertificate(false)}
+                                  className="mt-3 w-full py-2.5 rounded-xl border border-border/60 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                  ← Back to summary
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

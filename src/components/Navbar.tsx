@@ -1,38 +1,70 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import CandleLogomark from "./CandleLogomark";
 
 const navItems = [
   { label: "Research", href: "/research-archive", route: true },
   { label: "Projects", href: "/team-projects", route: true },
   { label: "Mentors", href: "/mentorship", route: true },
   { label: "Memorial", href: "/#memorial", route: false },
-  { label: "Donate", href: "/#donate", route: false },
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { user, profile, signOut } = useAuth();
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 });
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="mx-auto max-w-7xl section-padding py-4">
-        <div className="glass-card rounded-2xl px-6 py-3 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gradient-gold">Hadi</span>
-            <span className="text-2xl font-bold text-gradient-green">Wishes</span>
-          </a>
+      <div
+        className={`mx-auto transition-all duration-500 ${
+          scrolled ? "max-w-7xl px-4 md:px-8 py-2.5" : "max-w-7xl section-padding py-5"
+        }`}
+      >
+        <div
+          className={`relative rounded-2xl px-5 md:px-7 flex items-center justify-between transition-all duration-500 ${
+            scrolled ? "glass-card py-2.5" : "py-3.5"
+          }`}
+          style={
+            !scrolled
+              ? { background: "transparent", border: "1px solid hsl(var(--candle) / 0.06)" }
+              : undefined
+          }
+        >
+          {/* Brand */}
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <CandleLogomark size={22} className="transition-transform group-hover:scale-110" />
+            <span
+              className="text-xl font-medium tracking-tight italic"
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                color: "hsl(var(--foreground))",
+              }}
+            >
+              Hadi <span className="text-gradient-gold">Wishes</span>
+            </span>
+          </Link>
 
           {/* Desktop */}
-          <div className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
+          <div className="hidden md:flex items-center gap-7">
+            {navItems.map((item) =>
               item.route ? (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  className="text-[13px] font-medium tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-200"
                 >
                   {item.label}
                 </Link>
@@ -40,35 +72,50 @@ const Navbar = () => {
                 <a
                   key={item.href}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  className="text-[13px] font-medium tracking-wide text-muted-foreground hover:text-foreground transition-colors duration-200"
                 >
                   {item.label}
                 </a>
-              )
-            ))}
+              ),
+            )}
             {user && (
-              <Link to="/dashboard" className="text-sm font-medium text-primary hover:text-primary/80">
+              <Link to="/dashboard" className="text-[13px] font-medium text-primary hover:text-primary/80">
                 Dashboard
               </Link>
             )}
+
+            {/* divider */}
+            <span className="h-4 w-px" style={{ background: "hsl(var(--candle) / 0.2)" }} />
+
+            <a
+              href="/#donate"
+              className="text-[13px] font-semibold tracking-wide transition-colors"
+              style={{ color: "hsl(var(--hadi-red-soft))" }}
+            >
+              Donate ♥
+            </a>
+
             {user ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
-                  <UserIcon size={14} /> {profile?.display_name ?? "you"}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                  <UserIcon size={12} /> {profile?.display_name ?? "you"}
                 </span>
                 <button
                   onClick={signOut}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-muted transition-colors"
                   aria-label="Sign out"
-                  title="Sign out"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={14} />
                 </button>
               </div>
             ) : (
               <Link
                 to="/auth"
-                className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-[0.97] duration-150"
+                className="px-4 py-2 rounded-xl text-[13px] font-semibold transition-all active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--candle)), hsl(35 90% 50%))",
+                  color: "hsl(220 50% 6%)",
+                }}
               >
                 Sign in
               </Link>
@@ -83,6 +130,18 @@ const Navbar = () => {
           >
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
+
+          {/* Scroll progress hairline */}
+          <motion.div
+            className="absolute left-3 right-3 bottom-0 h-px origin-left rounded-full"
+            style={{
+              scaleX: progress,
+              background:
+                "linear-gradient(90deg, transparent, hsl(var(--candle) / 0.9), hsl(var(--hadi-red-soft) / 0.7), transparent)",
+              opacity: scrolled ? 1 : 0,
+              transition: "opacity 0.4s",
+            }}
+          />
         </div>
 
         {/* Mobile menu */}
@@ -95,7 +154,7 @@ const Navbar = () => {
               transition={{ duration: 0.2 }}
               className="glass-card rounded-2xl mt-2 p-4 md:hidden"
             >
-              {navItems.map((item) => (
+              {navItems.map((item) =>
                 item.route ? (
                   <Link
                     key={item.href}
@@ -114,8 +173,16 @@ const Navbar = () => {
                   >
                     {item.label}
                   </a>
-                )
-              ))}
+                ),
+              )}
+              <a
+                href="/#donate"
+                onClick={() => setOpen(false)}
+                className="block py-3 px-4 text-sm font-semibold rounded-xl"
+                style={{ color: "hsl(var(--hadi-red-soft))" }}
+              >
+                Donate ♥
+              </a>
               {user && (
                 <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 px-4 text-sm font-semibold text-primary rounded-xl">
                   Dashboard
@@ -132,7 +199,8 @@ const Navbar = () => {
                 <Link
                   to="/auth"
                   onClick={() => setOpen(false)}
-                  className="block mt-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold text-center"
+                  className="block mt-2 px-5 py-3 rounded-xl text-sm font-semibold text-center"
+                  style={{ background: "linear-gradient(135deg, hsl(var(--candle)), hsl(35 90% 50%))", color: "hsl(220 50% 6%)" }}
                 >
                   Sign in
                 </Link>

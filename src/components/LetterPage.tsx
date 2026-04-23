@@ -8,12 +8,14 @@ interface LetterPageProps {
   children: React.ReactNode;
   id?: string;
   className?: string;
+  letterNumber?: string;
+  topic?: string;
+  readingTime?: string;
+  align?: "center" | "left" | "right";
+  tilt?: number;
 }
 
-/**
- * A "page from Hadi's letter" — parchment background with a handwritten Bengali quote at top,
- * then the section content. Parallax-rotated as you scroll for a faux-3D book feel.
- */
+/** A "page from Hadi's letter" with editorial pacing. */
 const LetterPage = ({
   bengaliQuote,
   englishTranslation,
@@ -21,6 +23,11 @@ const LetterPage = ({
   children,
   id,
   className = "",
+  letterNumber = "01",
+  topic,
+  readingTime = "2 min letter",
+  align = "center",
+  tilt = 0,
 }: LetterPageProps) => {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -28,8 +35,15 @@ const LetterPage = ({
     offset: ["start end", "end start"],
   });
 
-  const rotate = useTransform(scrollYProgress, [0, 0.5, 1], [-1.5, 0, 1.5]);
-  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const rotate = useTransform(scrollYProgress, [0, 0.5, 1], [tilt - 1, tilt, tilt + 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
+
+  const alignClasses =
+    align === "left"
+      ? "mr-auto ml-0 md:ml-8 lg:ml-16 max-w-xl"
+      : align === "right"
+      ? "ml-auto mr-0 md:mr-8 lg:mr-16 max-w-xl"
+      : "mx-auto max-w-2xl";
 
   return (
     <section
@@ -37,11 +51,26 @@ const LetterPage = ({
       id={id}
       className={`relative py-24 md:py-32 section-padding overflow-hidden ${className}`}
     >
-      {/* Floating parchment quote at top */}
       <motion.div
         style={{ rotate, y }}
-        className="max-w-2xl mx-auto mb-16 relative"
+        className={`mb-16 relative ${alignClasses}`}
       >
+        {/* Letter meta */}
+        <div className="flex items-center justify-between mb-3 px-2">
+          <span
+            className="eyebrow no-rule"
+            style={{ color: "hsl(var(--candle))", fontSize: "0.625rem" }}
+          >
+            Letter №{letterNumber}{topic ? ` · ${topic}` : ""}
+          </span>
+          <span
+            className="text-[10px] tracking-[0.2em] uppercase font-medium"
+            style={{ color: "hsl(42 18% 55%)", fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            {readingTime}
+          </span>
+        </div>
+
         <div className="parchment-card p-8 md:p-10 relative">
           {/* Wax seal */}
           <div

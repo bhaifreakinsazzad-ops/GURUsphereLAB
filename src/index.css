@@ -322,6 +322,136 @@
     background: radial-gradient(ellipse at center, transparent 50%, hsl(220 50% 4% / 0.7) 100%);
     pointer-events: none;
   }
+
+  /* === EDITORIAL TYPE SYSTEM === */
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: hsl(var(--candle));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before,
+  .eyebrow.with-rule::after {
+    content: "";
+    width: 28px;
+    height: 1px;
+    background: hsl(var(--candle) / 0.6);
+  }
+  .eyebrow.no-rule::before { display: none; }
+
+  .display-xl {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(3rem, 7vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .display-lg {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.25rem, 4.5vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+    line-height: 1.55;
+    color: hsl(42 22% 75%);
+    text-wrap: pretty;
+  }
+
+  .measure { max-width: 65ch; }
+  .measure-narrow { max-width: 48ch; }
+
+  .dropcap::first-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    float: left;
+    font-size: 4.5em;
+    line-height: 0.85;
+    padding: 0.05em 0.12em 0 0;
+    color: hsl(var(--candle));
+    text-shadow: 0 2px 12px hsl(var(--candle) / 0.35);
+  }
+
+  .hairline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--candle) / 0.35), transparent);
+  }
+
+  .gold-rule {
+    width: 2px;
+    background: linear-gradient(180deg, transparent, hsl(var(--candle) / 0.6), transparent);
+  }
+
+  /* Film grain overlay */
+  .film-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* Editorial divider — thin gold line + diamond */
+  .editorial-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 4rem 0;
+  }
+  .editorial-divider::before,
+  .editorial-divider::after {
+    content: "";
+    flex: 1;
+    max-width: 180px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--candle) / 0.5), transparent);
+  }
+  .editorial-divider .diamond {
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    background: hsl(var(--candle));
+    box-shadow: 0 0 16px hsl(var(--candle) / 0.6);
+  }
+
+  /* Candle bokeh background */
+  .candle-bokeh {
+    background-image:
+      radial-gradient(circle at 12% 18%, hsl(var(--candle) / 0.18) 0px, transparent 4px),
+      radial-gradient(circle at 78% 32%, hsl(var(--candle) / 0.12) 0px, transparent 6px),
+      radial-gradient(circle at 38% 62%, hsl(var(--candle) / 0.15) 0px, transparent 3px),
+      radial-gradient(circle at 88% 78%, hsl(var(--candle) / 0.1) 0px, transparent 5px),
+      radial-gradient(circle at 22% 88%, hsl(var(--candle) / 0.14) 0px, transparent 4px),
+      radial-gradient(circle at 62% 12%, hsl(var(--candle) / 0.08) 0px, transparent 7px);
+    filter: blur(1.5px);
+  }
+
+  /* Newly-lit ring animation for memorial cards */
+  @keyframes fresh-light {
+    0% { box-shadow: 0 0 0 0 hsl(var(--candle) / 0.7); }
+    50% { box-shadow: 0 0 0 12px hsl(var(--candle) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--candle) / 0); }
+  }
+  .fresh-lit { animation: fresh-light 1.6s ease-out 3; }
 }
 
 @layer utilities {

@@ -296,13 +296,49 @@ const ExamArena = () => {
             <section className="pb-16 md:pb-24 section-padding">
               <div className="max-w-5xl mx-auto">
                 <ScrollReveal>
-                  <div className="text-center mb-10">
+                  <div className="text-center mb-6">
                     <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-2">
                       Choose Your Battlefield
                     </p>
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                       Pick a subject. Face the truth.
                     </h2>
+                  </div>
+                </ScrollReveal>
+
+                {/* Practice mode toggle */}
+                <ScrollReveal>
+                  <div className="max-w-md mx-auto mb-10 feature-card !p-4 flex items-center gap-4">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: "hsl(var(--pathshala-emerald) / 0.15)" }}
+                    >
+                      <GraduationCap size={18} className="text-pathshala-emerald" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-foreground flex items-center gap-2">
+                        Practice Mode
+                        {practiceMode && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-pathshala-emerald/20 text-pathshala-emerald">ON</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        No ranking impact · Half XP · Try freely
+                      </p>
+                    </div>
+                    <button
+                      role="switch"
+                      aria-checked={practiceMode}
+                      onClick={() => setPracticeMode((p) => !p)}
+                      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${
+                        practiceMode ? "bg-pathshala-emerald" : "bg-muted"
+                      }`}
+                    >
+                      <span
+                        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-background shadow transition-transform"
+                        style={{ transform: practiceMode ? "translateX(24px)" : "translateX(0)" }}
+                      />
+                    </button>
                   </div>
                 </ScrollReveal>
 

@@ -127,17 +127,25 @@ const ExamArena = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [practiceMode, setPracticeMode] = useState(false);
+  const [activePractice, setActivePractice] = useState(false);
+  const [showCertificate, setShowCertificate] = useState(false);
 
   const questions = selectedCategory ? getQuestionsForCategory(selectedCategory) : SAMPLE_QUESTIONS_FALLBACK;
+  const activeCategoryMeta = CATEGORIES.find((c) => c.id === selectedCategory);
+  // Practice earns half XP and does not affect ranking
+  const xpPerCorrect = activePractice ? 25 : 50;
 
   const startExam = (catId: string) => {
     setSelectedCategory(catId);
+    setActivePractice(practiceMode);
     setActiveView("exam");
     setCurrentQ(0);
     setSelectedAnswer(null);
     setShowResult(false);
     setScore(0);
     setAnswered(0);
+    setShowCertificate(false);
   };
 
   const handleAnswer = (idx: number) => {
@@ -161,6 +169,7 @@ const ExamArena = () => {
   const exitExam = () => {
     setActiveView("home");
     setSelectedCategory(null);
+    setShowCertificate(false);
   };
 
   return (

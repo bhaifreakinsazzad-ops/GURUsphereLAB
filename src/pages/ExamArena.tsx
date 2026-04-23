@@ -544,7 +544,7 @@ const ExamArena = () => {
           >
             <div className="max-w-2xl mx-auto">
               {/* Exam Header */}
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={exitExam}
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors active:scale-95"
@@ -556,10 +556,21 @@ const ExamArena = () => {
                     {currentQ + 1}/{questions.length}
                   </span>
                   <span className="flex items-center gap-1.5 font-semibold text-pathshala-gold tabular-nums">
-                    <Zap size={14} /> {score * 50} XP
+                    <Zap size={14} /> {score * xpPerCorrect} XP
                   </span>
                 </div>
               </div>
+
+              {/* Practice mode banner */}
+              {activePractice && (
+                <div className="mb-6 flex items-center gap-3 px-4 py-2.5 rounded-xl border border-pathshala-emerald/30 bg-pathshala-emerald/10">
+                  <Sparkles size={16} className="text-pathshala-emerald shrink-0" />
+                  <p className="text-xs text-foreground">
+                    <strong className="text-pathshala-emerald">Practice round</strong>
+                    <span className="text-muted-foreground"> · No ranking impact · Earning {xpPerCorrect} XP per correct answer</span>
+                  </p>
+                </div>
+              )}
 
               {/* Progress bar */}
               <div className="w-full h-1.5 bg-muted rounded-full mb-10 overflow-hidden">

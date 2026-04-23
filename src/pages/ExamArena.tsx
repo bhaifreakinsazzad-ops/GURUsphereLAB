@@ -651,7 +651,7 @@ const ExamArena = () => {
                             <Zap size={16} className="text-pathshala-emerald" />
                           </div>
                           <div>
-                            <p className="font-semibold text-sm text-foreground">+50 XP — Correct!</p>
+                            <p className="font-semibold text-sm text-foreground">+{xpPerCorrect} XP — Correct!</p>
                             <p className="text-xs text-muted-foreground">You know your stuff.</p>
                           </div>
                         </div>

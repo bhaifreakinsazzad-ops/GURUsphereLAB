@@ -681,34 +681,72 @@ const ExamArena = () => {
                           Next Question →
                         </button>
                       ) : (
-                        <div className="mt-6 text-center">
-                          <div className="feature-card !p-8">
+                        <div className="mt-6">
+                          <div className="feature-card !p-8 text-center">
                             <Trophy size={36} className="mx-auto mb-3 text-pathshala-gold" />
-                            <h3 className="text-xl font-bold text-foreground mb-1">Exam Complete</h3>
+                            <h3 className="text-xl font-bold text-foreground mb-1">
+                              {activePractice ? "Practice Round Complete" : "Exam Complete"}
+                            </h3>
                             <p className="text-3xl font-bold text-gradient-gold tabular-nums mb-1">
                               {score}/{questions.length}
                             </p>
-                            <p className="text-sm text-muted-foreground mb-4">
-                              You earned <strong className="text-pathshala-gold">{score * 50} XP</strong>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              You earned <strong className="text-pathshala-gold">{score * xpPerCorrect} XP</strong>
+                              {activePractice && (
+                                <span className="block text-xs mt-1 text-pathshala-emerald">
+                                  Practice mode — ranking unaffected
+                                </span>
+                              )}
                             </p>
-                            <div className="flex gap-3">
-                              <button
-                                onClick={exitExam}
-                                className="flex-1 py-3 rounded-xl border-2 border-border/60 font-semibold text-sm text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
-                              >
-                                Back to Arena
-                              </button>
-                              <button
-                                onClick={() => startExam(selectedCategory || "")}
-                                className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
-                                style={{
-                                  background: "hsl(var(--pathshala-gold))",
-                                  color: "hsl(var(--pathshala-deep))",
-                                }}
-                              >
-                                Retry
-                              </button>
-                            </div>
+                            <p className="text-xs text-muted-foreground mb-5">
+                              Rank tier: <strong className="text-foreground">{getRank(score * xpPerCorrect).title}</strong> {getRank(score * xpPerCorrect).icon}
+                            </p>
+
+                            {!showCertificate ? (
+                              <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                  onClick={exitExam}
+                                  className="flex-1 py-3 rounded-xl border-2 border-border/60 font-semibold text-sm text-foreground hover:bg-muted transition-colors active:scale-[0.97]"
+                                >
+                                  Back to Arena
+                                </button>
+                                <button
+                                  onClick={() => startExam(selectedCategory || "")}
+                                  className="flex-1 py-3 rounded-xl border-2 border-pathshala-gold/40 font-semibold text-sm text-foreground hover:bg-pathshala-gold/10 transition-colors active:scale-[0.97]"
+                                >
+                                  Retry
+                                </button>
+                                <button
+                                  onClick={() => setShowCertificate(true)}
+                                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
+                                  style={{
+                                    background: "hsl(var(--pathshala-gold))",
+                                    color: "hsl(var(--pathshala-deep))",
+                                  }}
+                                >
+                                  <Award size={14} /> Get Certificate
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="text-left mt-2">
+                                <CertificatePreview
+                                  data={{
+                                    name: "",
+                                    subject: activeCategoryMeta?.label || "General Knowledge",
+                                    score,
+                                    total: questions.length,
+                                    rankTitle: getRank(score * xpPerCorrect).title,
+                                    practice: activePractice,
+                                  }}
+                                />
+                                <button
+                                  onClick={() => setShowCertificate(false)}
+                                  className="mt-3 w-full py-2.5 rounded-xl border border-border/60 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                  ← Back to summary
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

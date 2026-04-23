@@ -4,10 +4,11 @@ import {
   Trophy, Zap, Crown, Shield, Flame, Star, Target, Award,
   Clock, Users, ChevronRight, ArrowLeft, Check, X as XIcon,
   Medal, Swords, TrendingUp, Brain, BookOpen, Code, Globe,
-  Atom, Calculator, Palette, Music, History
+  Atom, Calculator, Palette, Music, History, GraduationCap, Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
+import CertificatePreview from "@/components/CertificatePreview";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [

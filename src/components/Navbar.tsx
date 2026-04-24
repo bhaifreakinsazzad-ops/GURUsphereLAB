@@ -43,17 +43,22 @@ const Navbar = () => {
               : undefined
           }
         >
-          {/* Brand */}
-          <Link to="/" className="flex items-center gap-2.5 group">
+          {/* Brand — Bangla-first for BD audience */}
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="হাদির ইচ্ছা · Hadi Wishes home">
             <CandleLogomark size={22} className="transition-transform group-hover:scale-110" />
-            <span
-              className="text-xl font-medium tracking-tight italic"
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                color: "hsl(var(--foreground))",
-              }}
-            >
-              Hadi <span className="text-gradient-gold">Wishes</span>
+            <span className="flex flex-col leading-none">
+              <span
+                className="bengali-text text-[17px] md:text-[19px] font-semibold tracking-tight"
+                style={{ color: "hsl(var(--foreground))" }}
+              >
+                হাদির <span className="text-gradient-gold">ইচ্ছা</span>
+              </span>
+              <span
+                className="hidden sm:block text-[10px] tracking-[0.22em] uppercase mt-0.5"
+                style={{ color: "hsl(var(--candle) / 0.7)", fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Hadi Wishes
+              </span>
             </span>
           </Link>
 

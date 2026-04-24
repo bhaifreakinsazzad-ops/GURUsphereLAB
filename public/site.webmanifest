@@ -1,0 +1,15 @@
+{
+  "name": "হাদির ইচ্ছা · Hadi Wishes",
+  "short_name": "হাদির ইচ্ছা",
+  "description": "শহীদ ওসমান হাদীর স্মরণে — বাংলাদেশের জন্য বিনামূল্যে জ্ঞানভাণ্ডার।",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1119",
+  "theme_color": "#0a1119",
+  "lang": "bn-BD",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/og-image.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any" },
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}

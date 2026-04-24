@@ -96,12 +96,12 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="flex items-center gap-4 mb-8 flex-wrap"
           >
-            <span className="eyebrow no-rule" style={{ color: "hsl(var(--candle))" }}>
-              Est. 2024 · Memorial Edition
+            <span className="eyebrow no-rule bengali-text" style={{ color: "hsl(var(--candle))", letterSpacing: "0.08em" }}>
+              হাদির ইচ্ছা · Memorial Edition
             </span>
             <span className="h-px w-10" style={{ background: "hsl(var(--candle) / 0.4)" }} />
             <span className="eyebrow no-rule" style={{ color: "hsl(var(--hadi-red-soft))" }}>
-              Vol. I — A Letter From Hadi
+              শহীদ ওসমান হাদীর প্রতি শ্রদ্ধাঞ্জলি
             </span>
           </motion.div>
 
@@ -121,13 +121,23 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1.4, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="display-xl mb-8"
+            className="display-xl mb-4"
             style={{ color: "hsl(var(--foreground))" }}
           >
             The wishes
             <br />
             <span className="text-gradient-candle">he left behind.</span>
           </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.1 }}
+            className="bengali-text text-xl md:text-2xl mb-8 italic font-medium"
+            style={{ color: "hsl(var(--candle-soft))", lineHeight: 1.5 }}
+          >
+            যা সে চেয়েছিল — তোমার জন্য খোলা।
+          </motion.p>
 
           {/* Lede with drop-cap */}
           <motion.p
@@ -136,9 +146,9 @@ const HeroSection = () => {
             transition={{ duration: 1, delay: 1.4 }}
             className="lede dropcap measure mb-10"
           >
-            This is a quiet rebellion against a lie students were told for decades —
-            that the world's best knowledge is sealed behind walls. Free research, free
-            university courses, free premium tools, opened in his name.
+            বাংলাদেশের প্রতিটি জিজ্ঞাসু শিক্ষার্থীর জন্য — MIT, Harvard, Stanford-এর কোর্স,
+            premium tools, research papers — সব ফ্রি, তাঁর নামে খোলা। This is a quiet rebellion
+            against a lie students were told for decades — that the world's best knowledge is sealed behind walls.
           </motion.p>
 
           {/* CTAs — one primary, one ghost */}

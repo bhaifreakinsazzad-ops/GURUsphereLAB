@@ -135,6 +135,8 @@ const ExamArena = () => {
   const [activePractice, setActivePractice] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   const recordedRef = useRef<string | null>(null);
+  const autoCertRef = useRef<string | null>(null);
+  const hiddenCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const questions = selectedCategory ? getQuestionsForCategory(selectedCategory) : SAMPLE_QUESTIONS_FALLBACK;
   const activeCategoryMeta = CATEGORIES.find((c) => c.id === selectedCategory);

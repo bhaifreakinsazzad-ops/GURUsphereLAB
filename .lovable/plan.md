@@ -1,118 +1,95 @@
 ## Goal
 
-Three connected upgrades to Hadi Wishes / GURU'sphere:
+Layer a futuristic "GURU'sphere Lab" experience on top of the existing editorial Hadi Wishes site — without breaking any route, auth flow, Supabase logic, or the warm gold/green identity that already ships. All work is **additive**.
 
-1. **Hadi Meter Pro** — replace the existing 5-minute SJT with the new positive, values-based 7-promise Promise Calculator (uploaded `HadiMeterPro.jsx`).
-2. **Weekly Learning Missions** — bonus-XP goals on the Dashboard.
-3. **Course Progress Tracking** — completion %, next lesson, and time-spent for enrolled courses.
+## Important calibration
 
-All work is client-side (localStorage); no DB migration needed. The `/hadi-meter` route already exists and is wired through nav/CTAs, so this is mostly a content-and-mechanics swap rather than a new route.
+The reference files request a pure cold neon palette (#0a0a0a + cyan + crimson). The live site uses a warm editorial palette (deep navy + candle gold + Bangladesh red + emerald). Replacing it would destroy brand equity and conflict with stored design memory. Instead I will introduce a **scoped "lab" theme** (cyan + violet accents on the existing dark background) that lives only inside new lab sections — homepage editorial flow stays intact.
 
----
+## What gets built
 
-## 1. Hadi Meter Pro (replaces current `/hadi-meter`)
+### 1. New shared UI primitives (`src/components/lab/`)
+- `GlassCard.tsx` — `bg-white/5 backdrop-blur-xl border border-white/10`, optional glow color prop
+- `GlowButton.tsx` — cyan/violet/gold variants with hover shadow halo
+- `LabSectionHeader.tsx` — bilingual eyebrow + title
 
-**Why replace:** The current Hadi Meter is an SJT with combative wording ("গুলি কর, তবু মাথা নোয়াবো না", time-penalty timer). The new requirement is positive, inclusive, lawful, non-violent, growth-focused — incompatible with the old questions. Cleanest path is to swap the page contents.
+### 2. Learning Path section (`src/components/lab/LearningPathSection.tsx`)
+Mounted on homepage between `KnowledgeTreeSection` and Letter 04.
+- 7 nodes: Political Science, Literature, Cinema, Art, Theater, History, Digital Responsibility (Bangla + English labels)
+- **Default rendering: lightweight SVG constellation** (animated glowing nodes + connecting lines via Framer Motion). Fast, mobile-safe, zero new deps.
+- Click/tap node → glass overlay (Radix Dialog already in project) with topic description + "Start this path" CTA linking to existing routes (`/research-archive`, `/team-projects`, `/exam-arena`) or hash anchors.
+- Honors `prefers-reduced-motion`.
+- **No `@react-three/fiber` install** in this pass — keeps bundle small and avoids React 19 risk noted in repo guidance. We can add real 3D later behind a lazy import if you want; flagged as follow-up.
 
-**Files**
-- Rewrite `src/pages/HadiMeter.tsx` from the uploaded `HadiMeterPro.jsx`, adapted to TypeScript + project conventions:
-  - Replace raw `<main className="bg-slate-950 ...">` with `NebulaShell` so the page inherits the Hadi Wishes deep-green / glass aesthetic, navbar, and floating donate CTA.
-  - Keep the 3-screen flow: intro → quiz (one question at a time) → result.
-  - Keep all 7 dimensions, weights, options, level tiers, share/copy/retry exactly as in the upload.
-  - Result screen keeps: score/100 ring, level title, strongest, focus-next, dimension breakdown bars, 7-day action plan, Share / Copy / Retry.
-  - Use `lucide-react` icons already imported in the upload.
-  - Add page `<title>` via a small `useEffect` setting `document.title = "Hadi Meter | GURU'sphere"`.
-  - Remove the SJT timer, html2canvas download, Facebook share, and combative copy entirely.
-- Add a small safety footer: *"This is a self-reflection tool, not an official certification."*
-- Hook into learner history: when a learner reaches the result screen, call `recordAttempt(...)` (subject `"Hadi Meter"`, `practice: true`, `xp = Math.round(score / 4)`) so it shows on Dashboard activity but does not inflate ranked XP.
+### 3. Hadi Meter upgrade (`src/pages/HadiMeter.tsx`)
+Keep the existing 7-dimension Promise Calculator logic intact (Learning, Integrity, Moral Courage, Service, Unity, Discipline, Digital Responsibility — already matches the brief exactly). Upgrade the **results screen only**:
+- Add lazy-loaded `recharts` Radar chart (recharts already installed) showing the 7 dimensions
+- Keep existing bars as fallback below the radar
+- Keep score/level/strongest/focus/7-day plan/share/copy/retry
+- Keep the educational disclaimer
+- No change to scoring, storage, or `learnerHistory.recordAttempt` integration
 
-**Navigation**
-- `src/components/Navbar.tsx` — add `{ label: "Hadi Meter", href: "/hadi-meter", route: true }` to `navItems` (desktop + mobile menus already iterate this list).
-- Homepage CTA: add a compact card row inside `src/components/UniqueFeatures.tsx` (or a new banner above it) titled **"Try Hadi Meter — Calculate your 7 promises."** linking to `/hadi-meter`. Bilingual: Bengali subtitle "তোমার ৭টি অঙ্গীকার মাপো — ২ মিনিটে।"
+### 4. CommunityGrid section (`src/components/lab/CommunityGrid.tsx`)
+Mounted on homepage just before `ClubsSection`.
+- Masonry-ish responsive grid (CSS columns) of glass cards linking to **existing routes only**: Live Classroom (`#classroom`), Library (`#library`), Hadi Meter (`/hadi-meter`), Learning Path (`#learning-path`), Research Archive (`/research-archive`), Team Projects (`/team-projects`), Mentorship (`/mentorship`), Memorial Wall (`#memorial`)
+- Hover lift, glow border tinted by category
 
-**Tech notes**
-- Convert JSX to TSX: type `Stat`, `MiniInsight` props, the `screen` union (`"intro" | "quiz" | "result"`), `answers` as `Record<string, number>`, etc.
-- Tailwind classes used (`from-emerald-500`, `bg-slate-950`, `from-emerald-600 to-sky-600`) already work via the existing Tailwind config; no theme changes required.
-- Keep questions/promise text in Bangla per the upload — fits the project's Bengali-first rule for cultural/decorative copy.
+### 5. Homepage integration (`src/pages/Index.tsx`)
+Add two imports and mount `<LearningPathSection id="learning-path" />` and `<CommunityGrid />` in the existing flow. No removals.
 
----
+### 6. Navigation (`src/components/Navbar.tsx`)
+Add one item: `Learning Path → /#learning-path`. Keep all five existing items (Research, Projects, Mentors, Hadi Meter, Memorial) and the Dashboard/Sign-in/Donate behavior untouched.
 
-## 2. Weekly Learning Missions
+### 7. Hero CTAs (`src/components/HeroSection.tsx`)
+Append two ghost links next to existing "Light a candle" / "Keep his light burning":
+- "Try Hadi Meter" → `/hadi-meter`
+- "Explore the Archive" → `#learning-path`
 
-A rotating set of 4 bonus-XP missions per ISO week, completable from the Dashboard.
+Existing CTAs and styling preserved.
 
-**New file** `src/lib/missions.ts`
-- `WEEKLY_MISSION_TEMPLATES` — 8–10 mission definitions, e.g.:
-  - *Take 3 ranked exams* (+50 XP)
-  - *Earn a certificate* (+40 XP)
-  - *Maintain a 3-day streak* (+30 XP)
-  - *Try Hadi Meter once* (+20 XP)
-  - *Save a new course* (+20 XP)
-  - *Submit a research topic* (+50 XP)
-  - *Post a memorial note* (+15 XP)
-  - *Score ≥ 80% on any exam* (+40 XP)
-- `getCurrentWeekKey()` → `"2026-W18"` (ISO week)
-- `getWeeklyMissions(weekKey)` — deterministically picks 4 templates per week (seeded by week key) so the set is stable for the whole week.
-- `evaluateMissions(week, attempts, certs, savedWishesCount, contributionCounts)` — returns each mission with `{ progress, target, completed }`. Pure function; reads from `learnerHistory` + counts already loaded in Dashboard.
-- `claimMission(weekKey, missionId)` and `getClaimed(weekKey)` — persist claimed bonus XP in `localStorage` under `gs_missions_v1`.
-- `getMissionBonusXp()` — sum of all claimed bonuses across all weeks; added to `totalXp` in Dashboard.
+### 8. SEO (`index.html`)
+Append/refresh `<title>`, `<meta name="description">`, and OG tags to include "The School That Never Closes" wording. Existing metadata kept.
 
-**Dashboard changes** (`src/pages/Dashboard.tsx`)
-- New section **"This week's missions"** (under the top stats row, before "My Enrolled Courses"):
-  - 4 mission cards in a 2-col grid, each showing icon, title, progress bar (`progress / target`), XP reward chip, and a **Claim +XP** button enabled only when completed and not yet claimed.
-  - Header shows the week label + days remaining until reset.
-- Toast on claim ("+40 XP claimed!"), updates `totalXp` immediately.
-- Include `missionBonusXp` in the `totalXp` calculation that drives Level/Progress.
+## What is explicitly NOT touched
 
----
+- `src/integrations/supabase/*`, `.env`, `supabase/config.toml`
+- `AuthContext`, `Auth.tsx`, `Dashboard.tsx`, `Admin.tsx`, `ExamArena.tsx`, exam/cert/learner-history logic
+- All existing letter pages, memorial wall, donation section, footer
+- Color tokens in `index.css` (lab cyan/violet added as new tokens, no overrides)
+- Any existing route
 
-## 3. Course Progress Tracking
+## Technical details
 
-Track per-enrolled-course completion %, next lesson, and time spent. All client-side, keyed off `saved_wishes.wish_key`.
+```text
+src/components/lab/
+  GlassCard.tsx
+  GlowButton.tsx
+  LabSectionHeader.tsx
+  LearningPathSection.tsx     (SVG constellation + Radix Dialog overlay)
+  CommunityGrid.tsx
 
-**New file** `src/lib/courseProgress.ts`
-- Storage key `gs_course_progress_v1` shaped as:
-  ```ts
-  Record<wishKey, {
-    lessonsTotal: number;     // default 10 if unknown
-    lessonsDone: number;
-    nextLesson: string;       // free-text label, default "Lesson 1"
-    minutesSpent: number;
-    lastOpened: string;       // ISO
-  }>
-  ```
-- Helpers: `getProgress(key)`, `setProgress(key, patch)`, `tickMinutes(key, n)`, `markLessonDone(key, label?)`, `summary()` (returns avg %, total minutes, courses-completed count for the dashboard header).
+Modified (additive only):
+  src/index.css               (+ --lab-cyan, --lab-violet tokens, .glass-lab utility)
+  src/components/Navbar.tsx   (+ Learning Path link)
+  src/components/HeroSection.tsx (+ 2 secondary CTAs)
+  src/pages/Index.tsx         (+ 2 sections)
+  src/pages/HadiMeter.tsx     (+ lazy radar on results)
+  index.html                  (+ refreshed meta/OG)
+```
 
-**Dashboard changes** (`src/pages/Dashboard.tsx`, "My Enrolled Courses" section)
-- Each enrolled-course card now shows:
-  - Title (existing)
-  - **Progress bar** (`lessonsDone / lessonsTotal`) with `%` label
-  - **"Next: {nextLesson}"** line
-  - **Time spent**: `⏱ 1h 24m` formatted from `minutesSpent`
-  - Two small actions:
-    - **+1 lesson** — calls `markLessonDone()`, increments lessonsDone, advances next lesson label to `Lesson N+1`.
-    - **+15 min** — calls `tickMinutes(15)` to log study time.
-  - "Open" link (existing `wish_url`) — also calls `tickMinutes(5)` and updates `lastOpened` so just opening tracks engagement.
-- Add a roll-up stat card to the top stats row: **"Course Progress"** showing avg completion % across all enrolled courses + total study minutes.
-- Add a small in-card pill **"Completed ✓"** when `lessonsDone >= lessonsTotal`, and award a one-time +25 XP via the missions/bonus store.
+No new npm packages. Recharts, framer-motion, lucide-react, Radix Dialog, Tailwind already present.
 
----
+## Acceptance
 
-## Acceptance checklist
+- All existing routes load identically
+- Homepage gains Learning Path + Community Grid sections
+- `/hadi-meter` results show a radar chart (with dimension-bar fallback if recharts fails to lazy-load)
+- Mobile (≤390px): constellation collapses to a tap-friendly card carousel using the same data
+- Lighthouse mobile score not regressed (no new heavy deps)
+- TypeScript passes
 
-- `/hadi-meter` shows the new positive Promise Calculator (7 dimensions, intro → quiz → result, share / copy / retry, bilingual). No combative wording, no countdown timer, no html2canvas dependency on this page.
-- Document title = `Hadi Meter | GURU'sphere`. Safety disclaimer visible.
-- Navbar has a "Hadi Meter" link (desktop + mobile). Homepage shows a CTA "Try Hadi Meter — Calculate your 7 promises."
-- Dashboard shows a "This week's missions" section with 4 missions, live progress, and working Claim buttons that grant bonus XP.
-- "My Enrolled Courses" cards each show progress bar, next lesson, time spent, and `+1 lesson` / `+15 min` controls.
-- Top stats row includes a Course Progress card alongside Level / Streak / Ranked XP / Heatmap.
-- All new logic is client-side (localStorage); no schema changes.
-- TypeScript build passes.
+## Follow-ups (not in this pass, ask if you want them)
 
----
-
-## Out of scope
-
-- Server-side persistence / cross-device sync of missions and course progress (still localStorage like existing learner history).
-- New Supabase tables.
-- Real lesson content / video player — we're tracking progress against externally-linked courses (the `wish_url`), which matches the current "enroll = save wish" model.
+- Real `@react-three/fiber` constellation behind a desktop-only lazy import
+- Particle ambient layer on hero
+- Bilingual i18n toggle

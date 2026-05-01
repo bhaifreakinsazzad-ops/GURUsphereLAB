@@ -73,6 +73,8 @@ const Index = () => {
       <ExamSection />
       <KnowledgeTreeSection />
 
+      <LearningPathSection id="learning-path" />
+
       <EditorialDivider />
 
       <LetterPage
@@ -100,6 +102,7 @@ const Index = () => {
 
       <MemorialWallSection />
       <UniqueFeatures />
+      <CommunityGrid />
       <ClubsSection />
       <DonationSection />
       <FooterSection />

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CandleLogomark from "./CandleLogomark";
 
 const navItems = [
+  { label: "Learning Path", href: "/#learning-path", route: false },
   { label: "Research", href: "/research-archive", route: true },
   { label: "Projects", href: "/team-projects", route: true },
   { label: "Mentors", href: "/mentorship", route: true },

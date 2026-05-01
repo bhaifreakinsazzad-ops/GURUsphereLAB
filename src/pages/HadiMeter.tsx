@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   Award, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Compass,
   Copy, Flag, HeartHandshake, Info, Leaf, RefreshCw, Share2,
@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import NebulaShell from "@/components/NebulaShell";
 import { recordAttempt } from "@/lib/learnerHistory";
+
+const HadiRadar = lazy(() => import("@/components/lab/HadiRadar"));
 
 /* ── Question Bank ── */
 type Question = {
@@ -469,6 +471,19 @@ export default function HadiMeter() {
                 <Award className="h-7 w-7 text-pathshala-gold" />
               </div>
 
+              <Suspense fallback={<div className="h-[340px] flex items-center justify-center text-xs text-muted-foreground">Loading radar…</div>}>
+                <HadiRadar
+                  data={dimensionScores.map((q) => ({
+                    subject: q.bn,
+                    value: clamp((answers[q.id] ?? 0) + (promises[q.id] ? 4 : 0)),
+                    fullMark: 100,
+                  }))}
+                />
+              </Suspense>
+
+              <p className="mt-2 mb-4 text-center text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+                Promise Radar · ৭ মাত্রা
+              </p>
               <div className="space-y-4">
                 {dimensionScores.map((q) => {
                   const Icon = q.icon;

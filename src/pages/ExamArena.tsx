@@ -9,7 +9,10 @@ import {
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import CertificatePreview from "@/components/CertificatePreview";
+import TopicLeaderboard from "@/components/TopicLeaderboard";
 import { recordAttempt, recordCertificate } from "@/lib/learnerHistory";
+import { renderCertificate, downloadCertificate } from "@/lib/certificate";
+import { toast } from "@/hooks/use-toast";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [
@@ -132,6 +135,8 @@ const ExamArena = () => {
   const [activePractice, setActivePractice] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   const recordedRef = useRef<string | null>(null);
+  const autoCertRef = useRef<string | null>(null);
+  const hiddenCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const questions = selectedCategory ? getQuestionsForCategory(selectedCategory) : SAMPLE_QUESTIONS_FALLBACK;
   const activeCategoryMeta = CATEGORIES.find((c) => c.id === selectedCategory);
@@ -172,6 +177,54 @@ const ExamArena = () => {
       });
     }
   }, [activeView, selectedCategory, currentQ, showResult, answered, score, questions.length, xpPerCorrect, activePractice, activeCategoryMeta]);
+
+  // Auto-generate + auto-download a certificate when learner passes (≥ 60%) and not practice.
+  useEffect(() => {
+    if (
+      activeView !== "exam" ||
+      !selectedCategory ||
+      currentQ !== questions.length - 1 ||
+      !showResult ||
+      activePractice
+    ) return;
+    const key = `cert-${selectedCategory}-${score}-${questions.length}`;
+    if (autoCertRef.current === key) return;
+    const pct = score / Math.max(questions.length, 1);
+    if (pct < 0.6) return;
+    autoCertRef.current = key;
+
+    const subject = activeCategoryMeta?.label || "General Knowledge";
+    const rankTitle = getRank(score * xpPerCorrect).title;
+    const learnerName = "Anonymous Learner";
+    const canvas = hiddenCanvasRef.current ?? document.createElement("canvas");
+    hiddenCanvasRef.current = canvas;
+    renderCertificate(
+      canvas,
+      { name: learnerName, subject, score, total: questions.length, rankTitle, practice: false },
+      "gold",
+    );
+    setTimeout(() => {
+      try {
+        downloadCertificate(canvas, `${learnerName}_${subject}_certificate`);
+        recordCertificate({
+          name: learnerName,
+          subject,
+          score,
+          total: questions.length,
+          rankTitle,
+          theme: "gold",
+          practice: false,
+        });
+        toast({
+          title: "🏅 Certificate earned!",
+          description: "Downloaded automatically. Personalize the name and re-share below.",
+        });
+      } catch {
+        /* ignore */
+      }
+    }, 60);
+  }, [activeView, selectedCategory, currentQ, showResult, score, questions.length, activePractice, xpPerCorrect, activeCategoryMeta]);
+
 
   const handleAnswer = (idx: number) => {
     if (selectedAnswer !== null) return;
@@ -473,6 +526,32 @@ const ExamArena = () => {
                       );
                     })}
                   </div>
+                </ScrollReveal>
+              </div>
+            </section>
+
+            {/* ── Topic Leaderboards (safe / non-shaming) ── */}
+            <section className="pb-16 md:pb-24 section-padding">
+              <div className="max-w-3xl mx-auto">
+                <ScrollReveal>
+                  <div className="text-center mb-8">
+                    <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-2">
+                      Topic Leaderboards
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                      Climb where you love. Quietly.
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+                      We only show top 5 per topic and never display lower ranks — your effort is the rank that matters.
+                    </p>
+                  </div>
+                </ScrollReveal>
+                <ScrollReveal delay={0.1}>
+                  <TopicLeaderboard
+                    categories={CATEGORIES.map((c) => ({
+                      id: c.id, label: c.label, bengali: c.bengali, color: c.color,
+                    }))}
+                  />
                 </ScrollReveal>
               </div>
             </section>

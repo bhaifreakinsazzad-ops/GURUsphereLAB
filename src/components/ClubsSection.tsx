@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
 import { motion } from "framer-motion";
 
@@ -41,19 +42,31 @@ const ClubsSection = () => {
           {clubs.map((club, i) => (
             <ScrollReveal key={club.name} delay={i * 0.08}>
               <motion.div
-                className="feature-card text-center cursor-default opacity-70 hover:opacity-100 transition-opacity"
+                className="feature-card text-center cursor-default opacity-80 hover:opacity-100 transition-opacity"
                 whileHover={{ y: -2 }}
               >
                 <div className="text-3xl mb-3">{club.emoji}</div>
                 <h3 className="font-semibold text-foreground text-sm">{club.name}</h3>
                 <p className="bengali-text text-xs text-muted-foreground mt-1">{club.bengali}</p>
-                <span className="inline-block mt-3 text-[10px] font-semibold tracking-widest uppercase text-pathshala-gold/60">
-                  Coming Soon
+                <span className="inline-block mt-3 text-[10px] font-semibold tracking-widest uppercase text-pathshala-gold/70">
+                  Joining Soon
                 </span>
               </motion.div>
             </ScrollReveal>
           ))}
         </div>
+
+        <ScrollReveal delay={0.2}>
+          <div className="mt-10 text-center">
+            <Link
+              to="/clubs"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all active:scale-[0.97]"
+              style={{ background: "hsl(var(--pathshala-gold))", color: "hsl(var(--pathshala-deep))" }}
+            >
+              Take the matching quiz · Join the waitlist →
+            </Link>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

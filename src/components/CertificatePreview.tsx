@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Share2 } from "lucide-react";
 import {
   CERT_THEMES,
   CertificateData,
@@ -7,6 +7,8 @@ import {
   downloadCertificate,
   renderCertificate,
 } from "@/lib/certificate";
+import { canvasToBlob, shareCertificate } from "@/lib/share";
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   data: CertificateData;
@@ -84,14 +86,36 @@ const CertificatePreview = ({ data, onDownload }: Props) => {
         />
       </div>
 
-      {/* Download */}
-      <button
-        onClick={handleDownload}
-        className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
-        style={{ background: "hsl(var(--pathshala-gold))", color: "hsl(var(--pathshala-deep))" }}
-      >
-        <Download size={16} /> Download Certificate (PNG)
-      </button>
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <button
+          onClick={handleDownload}
+          className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.97]"
+          style={{ background: "hsl(var(--pathshala-gold))", color: "hsl(var(--pathshala-deep))" }}
+        >
+          <Download size={16} /> Download PNG
+        </button>
+        <button
+          onClick={async () => {
+            if (!canvasRef.current) return;
+            const blob = await canvasToBlob(canvasRef.current);
+            const filename = `${(name || "learner").replace(/[^a-z0-9-_]+/gi, "_")}_${data.subject}_certificate.png`;
+            const result = await shareCertificate(
+              blob,
+              filename,
+              `I just earned a ${data.subject} certificate on GURU'sphere! 🎓`,
+            );
+            onDownload?.({ name: name || "Anonymous Learner", theme });
+            toast({
+              title: result === "shared" ? "Shared!" : result === "downloaded" ? "Downloaded for sharing" : "Caption copied",
+              description: result === "shared" ? "Thanks for spreading the word." : "Attach the file to your post.",
+            });
+          }}
+          className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-pathshala-gold/40 font-semibold text-sm text-foreground hover:bg-pathshala-gold/10 transition-colors active:scale-[0.97]"
+        >
+          <Share2 size={16} /> Share
+        </button>
+      </div>
     </div>
   );
 };

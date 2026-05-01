@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      club_waitlist: {
+        Row: {
+          club_slug: string
+          created_at: string
+          display_name: string | null
+          email: string
+          id: string
+          notes: string | null
+          quiz_match: string | null
+        }
+        Insert: {
+          club_slug: string
+          created_at?: string
+          display_name?: string | null
+          email: string
+          id?: string
+          notes?: string | null
+          quiz_match?: string | null
+        }
+        Update: {
+          club_slug?: string
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
+          notes?: string | null
+          quiz_match?: string | null
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount: number

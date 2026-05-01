@@ -70,6 +70,11 @@
     --nebula-violet: 260 70% 60%;
     --nebula-cyan: 190 80% 55%;
 
+    /* GURU'sphere Lab — holographic accents (additive, scoped to lab sections) */
+    --lab-cyan: 188 95% 55%;
+    --lab-violet: 275 85% 65%;
+    --lab-crimson: 350 90% 55%;
+
     --sidebar-background: 220 40% 5%;
     --sidebar-foreground: 42 25% 80%;
     --sidebar-primary: 42 85% 58%;

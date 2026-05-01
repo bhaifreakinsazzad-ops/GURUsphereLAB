@@ -18,6 +18,8 @@ import MemorialWallSection from "@/components/MemorialWallSection";
 import UniqueFeatures from "@/components/UniqueFeatures";
 import ClubsSection from "@/components/ClubsSection";
 import FooterSection from "@/components/FooterSection";
+import LearningPathSection from "@/components/lab/LearningPathSection";
+import CommunityGrid from "@/components/lab/CommunityGrid";
 
 const Index = () => {
   return (
@@ -71,6 +73,8 @@ const Index = () => {
       <ExamSection />
       <KnowledgeTreeSection />
 
+      <LearningPathSection id="learning-path" />
+
       <EditorialDivider />
 
       <LetterPage
@@ -98,6 +102,7 @@ const Index = () => {
 
       <MemorialWallSection />
       <UniqueFeatures />
+      <CommunityGrid />
       <ClubsSection />
       <DonationSection />
       <FooterSection />

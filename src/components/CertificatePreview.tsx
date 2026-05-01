@@ -10,9 +10,10 @@ import {
 
 interface Props {
   data: CertificateData;
+  onDownload?: (info: { name: string; theme: CertificateTheme }) => void;
 }
 
-const CertificatePreview = ({ data }: Props) => {
+const CertificatePreview = ({ data, onDownload }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [theme, setTheme] = useState<CertificateTheme>("gold");
   const [name, setName] = useState(data.name || "");
@@ -29,6 +30,7 @@ const CertificatePreview = ({ data }: Props) => {
       canvasRef.current,
       `${name || "learner"}_${data.subject}_certificate`,
     );
+    onDownload?.({ name: name || "Anonymous Learner", theme });
   };
 
   return (

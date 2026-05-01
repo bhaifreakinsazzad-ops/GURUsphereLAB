@@ -178,6 +178,54 @@ const ExamArena = () => {
     }
   }, [activeView, selectedCategory, currentQ, showResult, answered, score, questions.length, xpPerCorrect, activePractice, activeCategoryMeta]);
 
+  // Auto-generate + auto-download a certificate when learner passes (≥ 60%) and not practice.
+  useEffect(() => {
+    if (
+      activeView !== "exam" ||
+      !selectedCategory ||
+      currentQ !== questions.length - 1 ||
+      !showResult ||
+      activePractice
+    ) return;
+    const key = `cert-${selectedCategory}-${score}-${questions.length}`;
+    if (autoCertRef.current === key) return;
+    const pct = score / Math.max(questions.length, 1);
+    if (pct < 0.6) return;
+    autoCertRef.current = key;
+
+    const subject = activeCategoryMeta?.label || "General Knowledge";
+    const rankTitle = getRank(score * xpPerCorrect).title;
+    const learnerName = "Anonymous Learner";
+    const canvas = hiddenCanvasRef.current ?? document.createElement("canvas");
+    hiddenCanvasRef.current = canvas;
+    renderCertificate(
+      canvas,
+      { name: learnerName, subject, score, total: questions.length, rankTitle, practice: false },
+      "gold",
+    );
+    setTimeout(() => {
+      try {
+        downloadCertificate(canvas, `${learnerName}_${subject}_certificate`);
+        recordCertificate({
+          name: learnerName,
+          subject,
+          score,
+          total: questions.length,
+          rankTitle,
+          theme: "gold",
+          practice: false,
+        });
+        toast({
+          title: "🏅 Certificate earned!",
+          description: "Downloaded automatically. Personalize the name and re-share below.",
+        });
+      } catch {
+        /* ignore */
+      }
+    }, 60);
+  }, [activeView, selectedCategory, currentQ, showResult, score, questions.length, activePractice, xpPerCorrect, activeCategoryMeta]);
+
+
   const handleAnswer = (idx: number) => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(idx);

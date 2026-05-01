@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
-import { Zap, Users2, Mic, Brain } from "lucide-react";
+import { Zap, Users2, Mic, Brain, Sparkles, ChevronRight } from "lucide-react";
 
 const features = [
   {

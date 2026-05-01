@@ -530,6 +530,32 @@ const ExamArena = () => {
               </div>
             </section>
 
+            {/* ── Topic Leaderboards (safe / non-shaming) ── */}
+            <section className="pb-16 md:pb-24 section-padding">
+              <div className="max-w-3xl mx-auto">
+                <ScrollReveal>
+                  <div className="text-center mb-8">
+                    <p className="text-sm font-semibold tracking-widest uppercase text-pathshala-gold mb-2">
+                      Topic Leaderboards
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                      Climb where you love. Quietly.
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+                      We only show top 5 per topic and never display lower ranks — your effort is the rank that matters.
+                    </p>
+                  </div>
+                </ScrollReveal>
+                <ScrollReveal delay={0.1}>
+                  <TopicLeaderboard
+                    categories={CATEGORIES.map((c) => ({
+                      id: c.id, label: c.label, bengali: c.bengali, color: c.color,
+                    }))}
+                  />
+                </ScrollReveal>
+              </div>
+            </section>
+
             {/* ── Rewards & Certificates ── */}
             <section className="pb-24 md:pb-32 section-padding">
               <div className="max-w-5xl mx-auto">

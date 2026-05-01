@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Zap, Crown, Shield, Flame, Star, Target, Award,
@@ -9,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import CertificatePreview from "@/components/CertificatePreview";
+import { recordAttempt, recordCertificate } from "@/lib/learnerHistory";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [

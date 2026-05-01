@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Zap, Crown, Shield, Flame, Star, Target, Award,
@@ -9,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import CertificatePreview from "@/components/CertificatePreview";
+import { recordAttempt, recordCertificate } from "@/lib/learnerHistory";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [
@@ -130,6 +131,7 @@ const ExamArena = () => {
   const [practiceMode, setPracticeMode] = useState(false);
   const [activePractice, setActivePractice] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
+  const recordedRef = useRef<string | null>(null);
 
   const questions = selectedCategory ? getQuestionsForCategory(selectedCategory) : SAMPLE_QUESTIONS_FALLBACK;
   const activeCategoryMeta = CATEGORIES.find((c) => c.id === selectedCategory);
@@ -146,7 +148,30 @@ const ExamArena = () => {
     setScore(0);
     setAnswered(0);
     setShowCertificate(false);
+    recordedRef.current = null;
   };
+
+  // Record the attempt exactly once when the final question is answered.
+  useEffect(() => {
+    if (
+      activeView === "exam" &&
+      selectedCategory &&
+      currentQ === questions.length - 1 &&
+      showResult &&
+      recordedRef.current !== `${selectedCategory}-${currentQ}-${answered}`
+    ) {
+      recordedRef.current = `${selectedCategory}-${currentQ}-${answered}`;
+      recordAttempt({
+        category: selectedCategory,
+        categoryLabel: activeCategoryMeta?.label ?? selectedCategory,
+        score,
+        total: questions.length,
+        xp: score * xpPerCorrect,
+        rankTitle: getRank(score * xpPerCorrect).title,
+        practice: activePractice,
+      });
+    }
+  }, [activeView, selectedCategory, currentQ, showResult, answered, score, questions.length, xpPerCorrect, activePractice, activeCategoryMeta]);
 
   const handleAnswer = (idx: number) => {
     if (selectedAnswer !== null) return;
@@ -738,6 +763,17 @@ const ExamArena = () => {
                                     rankTitle: getRank(score * xpPerCorrect).title,
                                     practice: activePractice,
                                   }}
+                                  onDownload={({ name, theme }) =>
+                                    recordCertificate({
+                                      name,
+                                      subject: activeCategoryMeta?.label || "General Knowledge",
+                                      score,
+                                      total: questions.length,
+                                      rankTitle: getRank(score * xpPerCorrect).title,
+                                      theme,
+                                      practice: activePractice,
+                                    })
+                                  }
                                 />
                                 <button
                                   onClick={() => setShowCertificate(false)}

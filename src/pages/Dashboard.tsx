@@ -369,23 +369,68 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {enrolled.map((w) => {
-              const inner = (
-                <>
-                  <div className="text-[10px] uppercase tracking-wider text-pathshala-gold mb-2">{w.wish_type}</div>
-                  <h3 className="font-semibold leading-snug mb-3 line-clamp-2">{w.wish_title}</h3>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{new Date(w.created_at).toLocaleDateString()}</span>
-                    {w.wish_url && <ExternalLink size={13} className="text-primary" />}
+              const p = progressMap[w.wish_key] ?? getProgress(w.wish_key);
+              const pct = Math.round((p.lessonsDone / Math.max(p.lessonsTotal, 1)) * 100);
+              const completed = p.lessonsDone >= p.lessonsTotal && p.lessonsTotal > 0;
+              return (
+                <div key={w.id} className="nebula-card p-5 flex flex-col">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[10px] uppercase tracking-wider text-pathshala-gold">{w.wish_type}</div>
+                    {completed && (
+                      <span className="text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pathshala-emerald/15 text-pathshala-emerald font-bold">
+                        <CheckCircle2 size={10} /> Completed
+                      </span>
+                    )}
                   </div>
-                </>
-              );
-              return w.wish_url ? (
-                <a key={w.id} href={w.wish_url} target="_blank" rel="noopener noreferrer"
-                  className="nebula-card p-5 hover:scale-[1.02] transition-transform block">
-                  {inner}
-                </a>
-              ) : (
-                <div key={w.id} className="nebula-card p-5">{inner}</div>
+                  <h3 className="font-semibold leading-snug mb-3 line-clamp-2">{w.wish_title}</h3>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="font-semibold text-foreground tabular-nums">{pct}%</span>
+                      <span className="text-muted-foreground tabular-nums">
+                        {p.lessonsDone}/{p.lessonsTotal} lessons
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-pathshala-gold-light"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="truncate pr-2">Next: <span className="text-foreground font-medium">{p.nextLesson}</span></span>
+                      <span className="inline-flex items-center gap-1 shrink-0"><Clock size={11} /> {formatMinutes(p.minutesSpent)}</span>
+                    </div>
+
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => handleLessonDone(w.wish_key)}
+                        disabled={completed}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-primary/15 text-primary hover:bg-primary/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Plus size={11} /> Lesson
+                      </button>
+                      <button
+                        onClick={() => handleAddMinutes(w.wish_key, 15)}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-muted/60 text-foreground hover:bg-muted transition"
+                      >
+                        <Clock size={11} /> +15 min
+                      </button>
+                      {w.wish_url && (
+                        <a
+                          href={w.wish_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => handleOpenCourse(w.wish_key)}
+                          className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-pathshala-emerald/15 text-pathshala-emerald hover:bg-pathshala-emerald/25 transition"
+                        >
+                          Open <ExternalLink size={11} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>

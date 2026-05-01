@@ -9,7 +9,10 @@ import {
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import CertificatePreview from "@/components/CertificatePreview";
+import TopicLeaderboard from "@/components/TopicLeaderboard";
 import { recordAttempt, recordCertificate } from "@/lib/learnerHistory";
+import { renderCertificate, downloadCertificate } from "@/lib/certificate";
+import { toast } from "@/hooks/use-toast";
 
 /* ─── Rank Tiers ─── */
 const RANKS = [

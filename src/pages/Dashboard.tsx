@@ -282,6 +282,76 @@ const Dashboard = () => {
             {streak.lastActive ? `Last active ${streak.lastActive}` : "No activity yet — start today!"}
           </p>
         </div>
+
+        {/* Course Progress roll-up */}
+        <div className="nebula-card p-6 md:col-span-1 col-span-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-1">
+            <BookOpen size={13} className="text-primary" /> Course Progress
+          </div>
+          <div className="text-5xl font-bold text-gradient-green tabular-nums">{courseStats.avgPercent}%</div>
+          <div className="text-sm text-muted-foreground mt-2">
+            avg across {enrolled.length} course{enrolled.length === 1 ? "" : "s"}
+          </div>
+          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1"><Clock size={11} /> {formatMinutes(courseStats.totalMinutes)}</span>
+            <span className="inline-flex items-center gap-1"><CheckCircle2 size={11} /> {courseStats.completed} done</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Weekly Missions ── */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Target size={18} className="text-pathshala-emerald" /> This week&apos;s missions
+            <span className="text-xs font-normal text-muted-foreground bengali-text ml-1">সাপ্তাহিক লক্ষ্য</span>
+          </h2>
+          <span className="text-xs text-muted-foreground">
+            Resets in {daysLeftInWeek()} day{daysLeftInWeek() === 1 ? "" : "s"} · {weekKey}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {evaluatedMissions.map((m) => {
+            const pct = Math.round((m.progress / m.template.target) * 100);
+            return (
+              <div key={m.template.id} className="nebula-card p-5">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold leading-snug">{m.template.title}</h3>
+                    <p className="bengali-text text-xs text-muted-foreground mt-0.5">{m.template.bengali}</p>
+                  </div>
+                  <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-pathshala-gold/15 text-pathshala-gold text-[11px] font-bold px-2 py-1">
+                    <Gift size={11} /> +{m.template.xp} XP
+                  </span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-pathshala-emerald to-primary"
+                    style={{ width: `${Math.min(100, pct)}%` }}
+                  />
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground tabular-nums">
+                    {m.progress} / {m.template.target}
+                  </span>
+                  {m.claimed ? (
+                    <span className="inline-flex items-center gap-1 text-pathshala-emerald font-semibold">
+                      <CheckCircle2 size={12} /> Claimed
+                    </span>
+                  ) : (
+                    <button
+                      disabled={!m.completed}
+                      onClick={() => handleClaim(m)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition"
+                    >
+                      Claim +{m.template.xp}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Enrolled courses ── */}

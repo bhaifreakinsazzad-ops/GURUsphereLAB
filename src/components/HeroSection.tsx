@@ -168,6 +168,32 @@ const HeroSection = () => {
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
             <a
+              href="/hadi-meter"
+              onMouseEnter={playSpark}
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-300 active:scale-[0.97] backdrop-blur-md"
+              style={{
+                background: "hsl(var(--lab-cyan) / 0.10)",
+                color: "hsl(var(--lab-cyan))",
+                border: "1px solid hsl(var(--lab-cyan) / 0.45)",
+              }}
+            >
+              Try Hadi Meter
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
+            <a
+              href="#learning-path"
+              onMouseEnter={playSpark}
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-300 active:scale-[0.97] backdrop-blur-md"
+              style={{
+                background: "hsl(var(--lab-violet) / 0.10)",
+                color: "hsl(var(--lab-violet))",
+                border: "1px solid hsl(var(--lab-violet) / 0.45)",
+              }}
+            >
+              Explore the Archive
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
+            <a
               href="#donate"
               onMouseEnter={playSpark}
               className="group inline-flex items-center gap-1.5 text-[14px] font-medium tracking-wide sans relative"

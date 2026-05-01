@@ -763,6 +763,17 @@ const ExamArena = () => {
                                     rankTitle: getRank(score * xpPerCorrect).title,
                                     practice: activePractice,
                                   }}
+                                  onDownload={({ name, theme }) =>
+                                    recordCertificate({
+                                      name,
+                                      subject: activeCategoryMeta?.label || "General Knowledge",
+                                      score,
+                                      total: questions.length,
+                                      rankTitle: getRank(score * xpPerCorrect).title,
+                                      theme,
+                                      practice: activePractice,
+                                    })
+                                  }
                                 />
                                 <button
                                   onClick={() => setShowCertificate(false)}

@@ -1,531 +1,547 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Clock, ChevronRight, Share2, Download, Facebook, RotateCcw } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import html2canvas from "html2canvas";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Award, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Compass,
+  Copy, Flag, HeartHandshake, Info, Leaf, RefreshCw, Share2,
+  ShieldCheck, Sparkles, Target, Trophy, Users, type LucideIcon,
+} from "lucide-react";
+import NebulaShell from "@/components/NebulaShell";
+import { recordAttempt } from "@/lib/learnerHistory";
 
-// ── Question Bank ──
-const ALL_QUESTIONS = [
-  {
-    id: 1,
-    text: "আপনার চোখের সামনে প্রভাবশালী এবং সশস্ত্র একটি মহল সাধারণ ছাত্রদের ওপর হামলা করতে আসছে। সবাই পালাচ্ছে। আপনি কী করবেন?",
-    options: [
-      { text: "নিজের নিরাপত্তার জন্য সবার সাথে নিরাপদ স্থানে চলে যাব।", weight: 0 },
-      { text: "দূর থেকে ভিডিও করে সোশ্যাল মিডিয়ায় লাইভ করব।", weight: 3 },
-      { text: "পুলিশ বা প্রশাসনকে দ্রুত খবর দেওয়ার চেষ্টা করব।", weight: 6 },
-      { text: "\"যা হওয়ার হবে\"— এই ভেবে যারা পালাচ্ছে তাদের একত্রিত করে বুক চিতিয়ে সামনে দাঁড়াব।", weight: 10 },
-    ],
-  },
-  {
-    id: 2,
-    text: "একটি বিদেশি রাষ্ট্র নানাভাবে আপনার দেশের অভ্যন্তরীণ রাজনীতি ও অর্থনীতিতে হস্তক্ষেপ করছে এবং সাংস্কৃতিক আগ্রাসন চালাচ্ছে।",
-    options: [
-      { text: "এগুলো পলিটিকাল বিষয়, আমার ব্যক্তিগত জীবনে এর কোনো প্রভাব নেই।", weight: 0 },
-      { text: "বন্ধুদের সাথে আড্ডায় এ নিয়ে বিরক্তি প্রকাশ করব।", weight: 3 },
-      { text: "অনলাইনে এর বিরুদ্ধে জনমত গড়ে তোলার জন্য লেখালেখি করব।", weight: 6 },
-      { text: "রাস্তায় নেমে যেকোনো গণ-আন্দোলনে প্রথম সারিতে থেকে এর প্রতিবাদ করব এবং বিদেশি পণ্য বয়কটের ডাক দেব।", weight: 10 },
-    ],
-  },
-  {
-    id: 3,
-    text: "আপনি একটি যৌক্তিক আন্দোলনের মিছিলে আছেন। হঠাৎ করে পরিস্থিতি উত্তপ্ত হয়ে গেল এবং নেতৃত্ব দেওয়ার মতো কেউ নেই।",
-    options: [
-      { text: "ঝামেলা বুঝে সেখান থেকে সরে পড়ব।", weight: 0 },
-      { text: "পরিচিত কাউকে খুঁজব যে নেতৃত্ব দিতে পারবে।", weight: 3 },
-      { text: "সবাইকে শান্ত থাকার পরামর্শ দিয়ে পেছনের সারিতে অবস্থান নেব।", weight: 6 },
-      { text: "নিজে সামনে গিয়ে মেগাফোন হাতে নেব এবং সবাইকে সুসংগঠিত করে নির্দেশ দেব।", weight: 10 },
-    ],
-  },
-  {
-    id: 4,
-    text: "সোশ্যাল মিডিয়ায় একটি খবর খুব ভাইরাল হয়েছে, যা সাধারণ মানুষকে খেপিয়ে তুলছে, কিন্তু আপনার মনে হচ্ছে খবরটি ফেক বা প্রোপাগান্ডা।",
-    options: [
-      { text: "সবাই যা শেয়ার করছে, আমিও তা শেয়ার করব।", weight: 0 },
-      { text: "চুপ থাকব, কারণ সত্যি-মিথ্যা যাচাই করার সময় নেই।", weight: 3 },
-      { text: "নিজের টাইমলাইনে লিখব যে খবরটি যাচাই করা প্রয়োজন।", weight: 6 },
-      { text: "নিজে ফ্যাক্ট-চেক করে সঠিক তথ্য প্রমাণসহ তুলে ধরব এবং প্রোপাগান্ডার বিরুদ্ধে শক্ত অবস্থান নেব।", weight: 10 },
-    ],
-  },
-  {
-    id: 5,
-    text: "রাস্তায় একজন অজ্ঞাত মানুষ রক্তাক্ত অবস্থায় পড়ে আছে। তাকে হাসপাতালে নিলে আপনাকে পুলিশের জেরার মুখে পড়তে হতে পারে।",
-    options: [
-      { text: "এড়িয়ে যাব, নিজের বিপদে পড়ার দরকার নেই।", weight: 0 },
-      { text: "অন্য কাউকে সাহায্য করার জন্য ডেকে নিজে চলে যাব।", weight: 3 },
-      { text: "ইমার্জেন্সি নাম্বারে কল করে অ্যাম্বুলেন্স ডাকব।", weight: 6 },
-      { text: "পুলিশের জেরার পরোয়া না করে নিজে তাকে কাঁধে করে দ্রুত হাসপাতালে নিয়ে যাব।", weight: 10 },
-    ],
-  },
-  {
-    id: 6,
-    text: "আপনি অন্যায়ের প্রতিবাদ করে একটি পোস্ট দিয়েছেন। এরপর আপনার কাছে একটি বেনামি হুমকি আসলো পোস্ট মুছে ফেলার জন্য।",
-    options: [
-      { text: "ভয় পেয়ে সাথে সাথে পোস্ট মুছে ফেলব।", weight: 0 },
-      { text: "পোস্ট অনলি মি (Only Me) করে দেব।", weight: 3 },
-      { text: "থানায় গিয়ে সাধারণ ডায়েরি (GD) করব।", weight: 6 },
-      { text: "হুমকির স্ক্রিনশট দিয়ে আরও কড়া ভাষায় আরেকটি পোস্ট দেব এবং বলব \"গুলির মুখে কথা কবো\"।", weight: 10 },
-    ],
-  },
-  {
-    id: 7,
-    text: "আপনাকে একটি লোভনীয় চাকরি বা স্কলারশিপের অফার দেওয়া হলো, কিন্তু শর্ত হলো আপনাকে আপনার বর্তমান প্রতিবাদী রাজনৈতিক আদর্শ থেকে সরে আসতে হবে।",
-    options: [
-      { text: "ক্যারিয়ার সবার আগে, তাই শর্ত মেনে নেব।", weight: 0 },
-      { text: "শর্ত মানব, তবে ভেতরে ভেতরে নিজের আদর্শ লালন করব।", weight: 3 },
-      { text: "অফারটি ভদ্রভাবে প্রত্যাখ্যান করব।", weight: 6 },
-      { text: "তাদের মুখের ওপর অফারটি ছুড়ে মারব এবং এই শর্ত দেওয়ার স্পর্ধা নিয়ে প্রশ্ন তুলব।", weight: 10 },
-    ],
-  },
-  {
-    id: 8,
-    text: "আপনার একজন সহযোদ্ধাকে প্রশাসন অন্যায়ভাবে তুলে নিয়ে যাচ্ছে।",
-    options: [
-      { text: "নিজের নাম যেন না আসে তাই লুকিয়ে থাকব।", weight: 0 },
-      { text: "আইনজীবীর সাথে পরামর্শ করে আইনি পথে লড়ার চেষ্টা করব।", weight: 3 },
-      { text: "সোশ্যাল মিডিয়ায় হ্যাশট্যাগ ট্রেন্ড শুরু করব।", weight: 6 },
-      { text: "নিজে গিয়ে তাদের গাড়ির সামনে পথ আটকে দাঁড়াব, \"ওকে নিলে আমাকেও নিতে হবে\"।", weight: 10 },
-    ],
-  },
-  {
-    id: 9,
-    text: "আপনার কাছে দেশের বাইরে সেটেল হওয়ার সুযোগ এসেছে। এদিকে দেশে একটি বড় গণঅভ্যুত্থান চলছে।",
-    options: [
-      { text: "দেশ নিয়ে ভেবে লাভ নেই, নিজের ভবিষ্যৎ গড়তে চলে যাব।", weight: 0 },
-      { text: "বাইরে গিয়ে রেমিট্যান্স পাঠিয়ে দেশের উপকার করব।", weight: 3 },
-      { text: "বাইরে গিয়ে আন্তর্জাতিক মিডিয়াতে দেশের পক্ষে কথা বলব।", weight: 6 },
-      { text: "সব সুযোগ বাতিল করে দেশের এই গুরুত্বপূর্ণ সময়ে রাজপথে থেকে লড়াই করব।", weight: 10 },
-    ],
-  },
-  {
-    id: 10,
-    text: "আপনার সামনে বন্দুক তাক করা আছে। আপনাকে বলা হলো, \"একটি শব্দ উচ্চারণ করলে গুলি করা হবে। শুধু মাথা নিচু করে চলে যাও।\"",
-    options: [
-      { text: "প্রাণের ভয়ে মাথা নিচু করে চলে যাব।", weight: 0 },
-      { text: "চুপ করে চলে যাব, তবে পরে সুযোগ বুঝে বদলা নেব।", weight: 3 },
-      { text: "তর্ক না করে কৌশলে স্থান ত্যাগ করব।", weight: 6 },
-      { text: "চোখের দিকে তাকিয়ে স্পষ্ট স্বরে বলব, \"গুলি কর, তবু মাথা নোয়াবো না।\"", weight: 10 },
-    ],
-  },
-];
-
-const RESULT_TIERS = [
-  {
-    min: 0, max: 39,
-    label: "সতর্ক যাত্রী",
-    message: "আপনাকে আরও সাহসী হতে হবে। হাদি ভাইয়ের আদর্শ বুঝতে হলে নিজের ভয়ের দেয়াল ভাঙুন।",
-    color: "hsl(0 60% 50%)",
-    bg: "hsl(0 40% 96%)",
-  },
-  {
-    min: 40, max: 69,
-    label: "সচেতন পর্যবেক্ষক",
-    message: "আপনি সচেতন, কিন্তু নিরাপদ দূরত্বে থাকতে পছন্দ করেন। আদর্শের পথে আরও এক ধাপ এগিয়ে আসুন।",
-    color: "hsl(42 85% 55%)",
-    bg: "hsl(42 60% 96%)",
-  },
-  {
-    min: 70, max: 89,
-    label: "ইনকিলাবি যোদ্ধা",
-    message: "আপনার ভেতরে ইনকিলাবি সত্তা প্রবল! আপনি অন্যায়ের বিরুদ্ধে লড়তে জানেন।",
-    color: "hsl(162 100% 21%)",
-    bg: "hsl(162 40% 96%)",
-  },
-  {
-    min: 90, max: 100,
-    label: "আমিই হাদি",
-    message: "অভিনন্দন! আপনার চিন্তা, সাহস এবং আপসহীন মানসিকতা শহীদ ওসমান হাদির আদর্শের এক নিখুঁত প্রতিচ্ছবি। আপনি আসলেই বুক চিতিয়ে বলতে পারেন— 'আমিই হাদি'।",
-    color: "hsl(42 90% 45%)",
-    bg: "hsl(42 50% 96%)",
-  },
-];
-
-const PENALTY_TIME = 20; // seconds
-const PENALTY_PERCENT = 0.10;
-const TOTAL_TIME = 300; // 5 minutes
-
-function shuffleArray<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-type Phase = "intro" | "quiz" | "result";
-
-const HadiMeter = () => {
-  const [phase, setPhase] = useState<Phase>("intro");
-  const [questions, setQuestions] = useState(ALL_QUESTIONS);
-  const [currentQ, setCurrentQ] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [scores, setScores] = useState<number[]>([]);
-  const [questionTimer, setQuestionTimer] = useState(0);
-  const [globalTimer, setGlobalTimer] = useState(TOTAL_TIME);
-  const [showingFeedback, setShowingFeedback] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
-  const questionStartRef = useRef(0);
-
-  // Start quiz
-  const startQuiz = useCallback(() => {
-    setQuestions(shuffleArray(ALL_QUESTIONS));
-    setCurrentQ(0);
-    setSelectedAnswer(null);
-    setScores([]);
-    setGlobalTimer(TOTAL_TIME);
-    setQuestionTimer(0);
-    questionStartRef.current = Date.now();
-    setPhase("quiz");
-  }, []);
-
-  // Global timer
-  useEffect(() => {
-    if (phase !== "quiz") return;
-    const iv = setInterval(() => {
-      setGlobalTimer((t) => {
-        if (t <= 1) {
-          // time up — auto-finish
-          clearInterval(iv);
-          setPhase("result");
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(iv);
-  }, [phase]);
-
-  // Per-question timer
-  useEffect(() => {
-    if (phase !== "quiz" || showingFeedback) return;
-    questionStartRef.current = Date.now();
-    setQuestionTimer(0);
-    const iv = setInterval(() => {
-      setQuestionTimer(Math.floor((Date.now() - questionStartRef.current) / 1000));
-    }, 200);
-    return () => clearInterval(iv);
-  }, [currentQ, phase, showingFeedback]);
-
-  const handleAnswer = (idx: number) => {
-    if (selectedAnswer !== null) return;
-    setSelectedAnswer(idx);
-    setShowingFeedback(true);
-
-    const elapsed = Math.floor((Date.now() - questionStartRef.current) / 1000);
-    let rawScore = questions[currentQ].options[idx].weight;
-    if (elapsed > PENALTY_TIME) {
-      rawScore = rawScore * (1 - PENALTY_PERCENT);
-    }
-    setScores((prev) => [...prev, rawScore]);
-
-    setTimeout(() => {
-      if (currentQ < questions.length - 1) {
-        setCurrentQ((q) => q + 1);
-        setSelectedAnswer(null);
-        setShowingFeedback(false);
-      } else {
-        setPhase("result");
-      }
-    }, 1200);
-  };
-
-  // Result calculation
-  const totalScore = scores.reduce((a, b) => a + b, 0);
-  const maxScore = questions.length * 10;
-  const percentage = Math.round((totalScore / maxScore) * 100);
-  const tier = RESULT_TIERS.find((t) => percentage >= t.min && percentage <= t.max) || RESULT_TIERS[0];
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
-
-  const downloadResult = async () => {
-    if (!resultRef.current) return;
-    const canvas = await html2canvas(resultRef.current, {
-      backgroundColor: "#fafaf7",
-      scale: 2,
-    });
-    const link = document.createElement("a");
-    link.download = "hadi-meter-result.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  };
-
-  const shareToFacebook = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(
-      `আমি The Hadi Meter-এ ${percentage}% স্কোর পেয়েছি! আমার ক্যাটাগরি: "${tier.label}" 🔥 তোমার ঔকাত কতটুকু? পরীক্ষা দাও এখনই!`
-    );
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, "_blank");
-  };
-
-  const currentQuestion = questions[currentQ];
-  const isPenalty = questionTimer > PENALTY_TIME;
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* ── INTRO ── */}
-      <AnimatePresence mode="wait">
-        {phase === "intro" && (
-          <motion.div
-            key="intro"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen flex flex-col items-center justify-center section-padding text-center"
-          >
-            <Link
-              to="/"
-              className="absolute top-6 left-6 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={16} /> ফিরে যান
-            </Link>
-
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-8"
-            >
-              <div className="w-28 h-28 rounded-full mx-auto mb-6 flex items-center justify-center text-6xl"
-                style={{ background: "hsl(var(--pathshala-green) / 0.1)" }}>
-                ⚖️
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.05] mb-4">
-                <span className="bengali-text">The Hadi Meter</span>
-              </h1>
-              <p className="bengali-text text-lg md:text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                তোমার ঔকাত কতটুকু? <br />
-                <span className="text-sm">শহীদ ওসমান হাদির আদর্শে তুমি কতটুকু অবিচল — ৫ মিনিটে জেনে নাও।</span>
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="space-y-4"
-            >
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground bengali-text mb-6">
-                <span className="px-3 py-1.5 rounded-lg bg-muted">🕐 ৫ মিনিট</span>
-                <span className="px-3 py-1.5 rounded-lg bg-muted">📝 ১০টি প্রশ্ন</span>
-                <span className="px-3 py-1.5 rounded-lg bg-muted">⚡ দ্রুত সিদ্ধান্ত = বেশি নম্বর</span>
-              </div>
-
-              <Button
-                onClick={startQuiz}
-                size="lg"
-                className="text-base font-bold px-10 py-6 rounded-xl bengali-text active:scale-[0.97] transition-transform"
-                style={{
-                  background: "hsl(var(--pathshala-green))",
-                  color: "hsl(var(--pathshala-cream))",
-                }}
-              >
-                পরীক্ষা শুরু করো
-              </Button>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* ── QUIZ ── */}
-        {phase === "quiz" && (
-          <motion.div
-            key="quiz"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="min-h-screen flex flex-col section-padding py-6"
-          >
-            {/* Top bar */}
-            <div className="max-w-2xl mx-auto w-full mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-mono text-muted-foreground tabular-nums">
-                  {currentQ + 1}/{questions.length}
-                </span>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} className={isPenalty ? "text-destructive" : "text-muted-foreground"} />
-                  <span className={`text-sm font-mono tabular-nums ${isPenalty ? "text-destructive font-bold" : "text-muted-foreground"}`}>
-                    {questionTimer}s
-                    {isPenalty && " ⚠️"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-muted-foreground" />
-                  <span className={`text-sm font-mono tabular-nums ${globalTimer < 60 ? "text-destructive font-bold" : "text-muted-foreground"}`}>
-                    {formatTime(globalTimer)}
-                  </span>
-                </div>
-              </div>
-              <Progress value={((currentQ + 1) / questions.length) * 100} className="h-2" />
-            </div>
-
-            {/* Question */}
-            <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentQ}
-                  initial={{ opacity: 0, x: 24, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: -24, filter: "blur(4px)" }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <p className="bengali-text text-lg md:text-xl font-semibold text-foreground leading-relaxed mb-8">
-                    {currentQuestion.text}
-                  </p>
-
-                  <div className="space-y-3">
-                    {currentQuestion.options.map((opt, idx) => {
-                      const isSelected = selectedAnswer === idx;
-                      const optionLabel = String.fromCharCode(2453 + idx); // ক, খ, গ, ঘ
-                      return (
-                        <motion.button
-                          key={idx}
-                          onClick={() => handleAnswer(idx)}
-                          disabled={selectedAnswer !== null}
-                          whileTap={{ scale: 0.97 }}
-                          className={`w-full text-left p-4 md:p-5 rounded-xl border-2 transition-all duration-200 bengali-text ${
-                            isSelected
-                              ? "border-foreground bg-foreground/5 shadow-md"
-                              : "border-border hover:border-foreground/30 hover:bg-muted/50"
-                          } ${selectedAnswer !== null && !isSelected ? "opacity-50" : ""}`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
-                              isSelected
-                                ? "bg-foreground text-background"
-                                : "bg-muted text-muted-foreground"
-                            }`}>
-                              {String.fromCharCode(65 + idx)}
-                            </span>
-                            <span className="text-sm md:text-base leading-relaxed">{opt.text}</span>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-
-                  {isPenalty && !showingFeedback && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bengali-text text-xs text-destructive mt-4 text-center"
-                    >
-                      ⚠️ ২০ সেকেন্ডের বেশি সময় নিচ্ছেন — ১০% নম্বর কাটা যাবে!
-                    </motion.p>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── RESULT ── */}
-        {phase === "result" && (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="min-h-screen flex flex-col items-center justify-center section-padding py-12"
-          >
-            {/* Shareable result card */}
-            <div
-              ref={resultRef}
-              className="max-w-md w-full rounded-2xl p-8 md:p-10 text-center"
-              style={{
-                background: tier.bg,
-                border: `2px solid ${tier.color}30`,
-              }}
-            >
-              <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: tier.color }}>
-                The Hadi Meter — Result
-              </p>
-
-              {/* Score circle */}
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center"
-                style={{
-                  background: `conic-gradient(${tier.color} ${percentage * 3.6}deg, hsl(var(--muted)) ${percentage * 3.6}deg)`,
-                }}
-              >
-                <div className="w-[104px] h-[104px] rounded-full flex flex-col items-center justify-center"
-                  style={{ background: tier.bg }}>
-                  <span className="text-3xl font-bold" style={{ color: tier.color }}>
-                    {percentage}%
-                  </span>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-              >
-                <h2 className="bengali-text text-2xl font-bold mb-3" style={{ color: tier.color }}>
-                  {tier.label}
-                </h2>
-                <p className="bengali-text text-sm leading-relaxed text-foreground/80">
-                  {tier.message}
-                </p>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  {totalScore.toFixed(1)} / {maxScore} নম্বর
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-1">GURU'sphere Lab</p>
-              </motion.div>
-            </div>
-
-            {/* Actions */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
-              className="flex flex-wrap justify-center gap-3 mt-8"
-            >
-              <Button
-                onClick={downloadResult}
-                variant="outline"
-                className="gap-2 rounded-xl active:scale-[0.97]"
-              >
-                <Download size={16} /> ডাউনলোড
-              </Button>
-              <Button
-                onClick={shareToFacebook}
-                className="gap-2 rounded-xl active:scale-[0.97]"
-                style={{
-                  background: "#1877F2",
-                  color: "#fff",
-                }}
-              >
-                <Facebook size={16} /> Facebook-এ শেয়ার
-              </Button>
-              <Button
-                onClick={() => { setPhase("intro"); setScores([]); }}
-                variant="ghost"
-                className="gap-2 rounded-xl active:scale-[0.97]"
-              >
-                <RotateCcw size={16} /> আবার দাও
-              </Button>
-            </motion.div>
-
-            <Link
-              to="/"
-              className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <ArrowLeft size={14} /> হোম পেজে ফিরে যান
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+/* ── Question Bank ── */
+type Question = {
+  id: string;
+  bn: string;
+  en: string;
+  weight: number;
+  icon: LucideIcon;
+  gradient: string;
+  softBg: string;
+  border: string;
+  text: string;
+  promise: string;
+  description: string;
+  question: string;
+  options: { label: string; value: number }[];
 };
 
-export default HadiMeter;
+const QUESTIONS: Question[] = [
+  {
+    id: "knowledge", bn: "জ্ঞানচর্চা", en: "Learning", weight: 18, icon: BookOpen,
+    gradient: "from-emerald-500 to-teal-600", softBg: "bg-emerald-50",
+    border: "border-emerald-200", text: "text-emerald-700",
+    promise: "প্রতিদিন অন্তত ২০ মিনিট শেখার অভ্যাস গড়ব।",
+    description: "নিজেকে উন্নত করার জন্য নিয়মিত পড়া, শেখা ও প্রশ্ন করা।",
+    question: "আপনি সপ্তাহে কতদিন নিয়মিত শেখার জন্য সময় দেন?",
+    options: [
+      { label: "প্রায় দিই না", value: 15 },
+      { label: "১–২ দিন", value: 40 },
+      { label: "৩–৪ দিন", value: 70 },
+      { label: "৫+ দিন", value: 100 },
+    ],
+  },
+  {
+    id: "integrity", bn: "সততা", en: "Integrity", weight: 17, icon: ShieldCheck,
+    gradient: "from-blue-500 to-indigo-600", softBg: "bg-blue-50",
+    border: "border-blue-200", text: "text-blue-700",
+    promise: "ভুল তথ্য, নকল কাজ ও অন্যায়ের সুবিধা নেব না।",
+    description: "সত্য যাচাই, নিজের ভুল স্বীকার, এবং কাজের মধ্যে স্বচ্ছতা রাখা।",
+    question: "কেউ ভুল তথ্য ছড়ালে আপনি সাধারণত কী করেন?",
+    options: [
+      { label: "এড়িয়ে যাই", value: 20 },
+      { label: "মনে মনে বুঝি কিন্তু বলি না", value: 45 },
+      { label: "ভদ্রভাবে সংশোধন করি", value: 80 },
+      { label: "প্রমাণসহ নিরাপদভাবে সচেতন করি", value: 100 },
+    ],
+  },
+  {
+    id: "courage", bn: "নৈতিক সাহস", en: "Moral Courage", weight: 15, icon: Flag,
+    gradient: "from-rose-500 to-orange-500", softBg: "bg-rose-50",
+    border: "border-rose-200", text: "text-rose-700",
+    promise: "অন্যায় দেখলে শান্তিপূর্ণ ও নিরাপদ পথে কথা বলব।",
+    description: "সম্মানজনক, আইনসম্মত ও অহিংস পদ্ধতিতে সত্যের পক্ষে দাঁড়ানো।",
+    question: "অন্যায় দেখলে আপনার সবচেয়ে কাছের আচরণ কোনটি?",
+    options: [
+      { label: "চুপ থাকি", value: 20 },
+      { label: "বিশ্বাসযোগ্য কাউকে জানাই", value: 55 },
+      { label: "ভদ্রভাবে আপত্তি জানাই", value: 80 },
+      { label: "প্রমাণ রেখে নিরাপদভাবে সমাধানের চেষ্টা করি", value: 100 },
+    ],
+  },
+  {
+    id: "service", bn: "সেবা", en: "Service", weight: 14, icon: HeartHandshake,
+    gradient: "from-fuchsia-500 to-pink-600", softBg: "bg-pink-50",
+    border: "border-pink-200", text: "text-pink-700",
+    promise: "পরিবার, বন্ধু বা সমাজের জন্য নিয়মিত ছোট ভালো কাজ করব।",
+    description: "কথার চেয়ে কাজে মানুষের পাশে দাঁড়ানোর অভ্যাস।",
+    question: "গত ৭ দিনে আপনি কাউকে শেখানো/সাহায্য করার কাজ করেছেন?",
+    options: [
+      { label: "না", value: 20 },
+      { label: "১ বার", value: 50 },
+      { label: "২–৩ বার", value: 80 },
+      { label: "প্রায় প্রতিদিন", value: 100 },
+    ],
+  },
+  {
+    id: "unity", bn: "ঐক্য ও সম্মান", en: "Unity", weight: 13, icon: Users,
+    gradient: "from-amber-500 to-yellow-500", softBg: "bg-amber-50",
+    border: "border-amber-200", text: "text-amber-700",
+    promise: "ভিন্নমত শুনব, অপমান নয়—যুক্তি দিয়ে কথা বলব।",
+    description: "ভিন্ন মতের মানুষকেও মর্যাদা দিয়ে সহযোগিতা করা।",
+    question: "ভিন্নমতের মানুষের সাথে আলোচনা হলে আপনি কী করেন?",
+    options: [
+      { label: "তর্ক এড়াই বা রেগে যাই", value: 20 },
+      { label: "শুনি, কিন্তু অস্বস্তি লাগে", value: 50 },
+      { label: "সম্মান রেখে কথা বলি", value: 80 },
+      { label: "কমন গ্রাউন্ড খুঁজে কাজ করি", value: 100 },
+    ],
+  },
+  {
+    id: "discipline", bn: "শৃঙ্খলা", en: "Discipline", weight: 12, icon: Target,
+    gradient: "from-violet-500 to-purple-600", softBg: "bg-violet-50",
+    border: "border-violet-200", text: "text-violet-700",
+    promise: "শেখা, কাজ ও সময় ব্যবস্থাপনায় ধারাবাহিক হব।",
+    description: "ছোট কাজ নিয়মিত করার শক্তি তৈরি করা।",
+    question: "আপনি নিজের লক্ষ্য ট্র্যাক করেন কীভাবে?",
+    options: [
+      { label: "করি না", value: 20 },
+      { label: "মনে রাখি", value: 45 },
+      { label: "নোট/লিস্ট রাখি", value: 75 },
+      { label: "সাপ্তাহিকভাবে রিভিউ করি", value: 100 },
+    ],
+  },
+  {
+    id: "digital", bn: "ডিজিটাল দায়িত্ব", en: "Digital Responsibility", weight: 11, icon: Compass,
+    gradient: "from-cyan-500 to-sky-600", softBg: "bg-cyan-50",
+    border: "border-cyan-200", text: "text-cyan-700",
+    promise: "অনলাইনে শেয়ার করার আগে যাচাই করব।",
+    description: "গুজব, ঘৃণা ও বিভ্রান্তি এড়িয়ে জ্ঞানভিত্তিক অনলাইন আচরণ।",
+    question: "কোনো ভাইরাল পোস্ট দেখলে আপনি কী করেন?",
+    options: [
+      { label: "দেখেই শেয়ার করি", value: 10 },
+      { label: "সন্দেহ হলে শেয়ার করি না", value: 55 },
+      { label: "সোর্স যাচাই করি", value: 80 },
+      { label: "যাচাই করে অন্যকেও সচেতন করি", value: 100 },
+    ],
+  },
+];
+
+const LEVELS = [
+  { min: 90, bn: "আলোকবর্তিকা", en: "Torchbearer", emoji: "🌟", message: "আপনার প্রতিশ্রুতি শক্তিশালী। এখন নেতৃত্ব মানে সেবা—অন্যদেরও শেখার পথে আনুন।" },
+  { min: 75, bn: "প্রতিশ্রুতিশীল নির্মাতা", en: "Promise Builder", emoji: "🌳", message: "দারুণ অগ্রগতি। ধারাবাহিকতা ধরে রাখলে আপনার প্রভাব আরও বাড়বে।" },
+  { min: 60, bn: "সচেতন শিক্ষার্থী", en: "Conscious Learner", emoji: "🌱", message: "ভালো ভিত্তি তৈরি হচ্ছে। একটি দুর্বল দিক বেছে নিয়ে ৭ দিনের চ্যালেঞ্জ শুরু করুন।" },
+  { min: 40, bn: "শুরু করা পথিক", en: "Starter", emoji: "🧭", message: "শুরুটাই সবচেয়ে বড় পদক্ষেপ। ছোট প্রতিশ্রুতি দিয়ে আজ থেকেই গতি তৈরি করুন।" },
+  { min: 0, bn: "নতুন অঙ্গীকার", en: "New Promise", emoji: "✨", message: "এটা কোনো বিচার নয়—এটা নিজের সাথে নতুন চুক্তি করার সুযোগ।" },
+];
+
+const clamp = (v: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
+const getLevel = (s: number) => LEVELS.find((l) => s >= l.min) || LEVELS[LEVELS.length - 1];
+
+type Screen = "intro" | "quiz" | "result";
+
+export default function HadiMeter() {
+  const [screen, setScreen] = useState<Screen>("intro");
+  const [index, setIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [promises, setPromises] = useState<Record<string, boolean>>(() =>
+    QUESTIONS.reduce<Record<string, boolean>>((acc, q) => { acc[q.id] = true; return acc; }, {}),
+  );
+  const [copied, setCopied] = useState(false);
+  const [recorded, setRecorded] = useState(false);
+
+  useEffect(() => { document.title = "Hadi Meter | GURU'sphere"; }, []);
+
+  const active = QUESTIONS[index];
+  const ActiveIcon = active.icon;
+  const answeredCount = Object.keys(answers).length;
+  const progress = Math.round((answeredCount / QUESTIONS.length) * 100);
+
+  const dimensionScores = useMemo(
+    () => QUESTIONS.map((q) => ({ ...q, score: answers[q.id] ?? 0 })),
+    [answers],
+  );
+
+  const score = useMemo(() => {
+    const total = QUESTIONS.reduce((sum, q) => sum + q.weight, 0);
+    const weighted = QUESTIONS.reduce((sum, q) => {
+      const a = answers[q.id] ?? 0;
+      const bonus = promises[q.id] ? 4 : 0;
+      return sum + clamp(a + bonus) * q.weight;
+    }, 0);
+    return Math.round(weighted / total);
+  }, [answers, promises]);
+
+  const level = getLevel(score);
+  const checkedPromises = QUESTIONS.filter((q) => promises[q.id]);
+  const sorted = [...dimensionScores].sort((a, b) => a.score - b.score);
+  const weakest = sorted[0];
+  const strongest = sorted[sorted.length - 1];
+  const allAnswered = answeredCount === QUESTIONS.length;
+  const selectedValue = answers[active.id];
+
+  // Record on entering result screen (once)
+  useEffect(() => {
+    if (screen === "result" && !recorded) {
+      try {
+        recordAttempt({
+          category: "hadi-meter",
+          categoryLabel: "Hadi Meter",
+          score,
+          total: 100,
+          xp: Math.round(score / 4),
+          rankTitle: level.en,
+          practice: true,
+        });
+      } catch { /* ignore */ }
+      setRecorded(true);
+    }
+  }, [screen, recorded, score, level.en]);
+
+  const buildShareText = () =>
+    `আমি GURU'sphere Hadi Meter-এ ${score}% (${level.bn}) স্কোর করেছি। আজকের অঙ্গীকার: ${checkedPromises.length}টি promise. #HadiMeter #GURUsphere`;
+
+  const copyResult = async () => {
+    try {
+      await navigator.clipboard.writeText(buildShareText());
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch { /* */ }
+  };
+
+  const shareResult = async () => {
+    const text = buildShareText();
+    if (navigator.share) {
+      try { await navigator.share({ title: "GURU'sphere Hadi Meter", text }); } catch { /* cancelled */ }
+    } else {
+      copyResult();
+    }
+  };
+
+  const reset = () => {
+    setScreen("intro");
+    setIndex(0);
+    setAnswers({});
+    setPromises(QUESTIONS.reduce<Record<string, boolean>>((acc, q) => { acc[q.id] = true; return acc; }, {}));
+    setRecorded(false);
+    setCopied(false);
+  };
+
+  const next = () => {
+    if (index < QUESTIONS.length - 1) setIndex((i) => i + 1);
+    else setScreen("result");
+  };
+  const back = () => {
+    if (index > 0) setIndex((i) => i - 1);
+    else setScreen("intro");
+  };
+
+  return (
+    <NebulaShell
+      title="Hadi Meter"
+      bengaliTitle="৭টি অঙ্গীকার · Promise Calculator"
+      subtitle="A safe, educational self-reflection tool. Your score is not a judgement — it's an invitation to your next promise."
+    >
+      {screen === "intro" && (
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="nebula-card p-6 md:p-8">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              GURU&apos;sphere Interactive Lab
+            </div>
+
+            <h2 className="text-3xl md:text-5xl font-black leading-tight tracking-tight">
+              Promise Calculator
+              <span className="block text-gradient-green mt-1">আমরা সবাই হাদী হব</span>
+            </h2>
+
+            <p className="mt-4 text-base md:text-lg leading-7 text-muted-foreground">
+              ৭টি মাত্রায় (জ্ঞান, সততা, সাহস, সেবা, ঐক্য, শৃঙ্খলা, ডিজিটাল দায়িত্ব) নিজের প্রতিশ্রুতি মাপুন।
+              এখানে স্কোর মানে বিচার নয়—স্কোর মানে নিজের অঙ্গীকার বুঝে পরবর্তী পদক্ষেপ নেওয়া।
+            </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <Stat label="Dimensions" value="7" />
+              <Stat label="Promise mode" value="On" />
+              <Stat label="Time" value="2 min" />
+            </div>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => setScreen("quiz")}
+                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground px-6 py-4 text-base font-bold shadow-xl transition hover:-translate-y-0.5"
+              >
+                Start Hadi Meter
+                <ChevronRight className="h-5 w-5 transition group-hover:translate-x-1" />
+              </button>
+              <a
+                href="#promise-map"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-background/40 backdrop-blur px-6 py-4 text-base font-bold text-foreground transition hover:bg-muted/50"
+              >
+                <Info className="h-5 w-5" /> View promises
+              </a>
+            </div>
+
+            <p className="mt-5 text-xs leading-6 text-muted-foreground">
+              Note: This is a self-reflection tool, not an official certification. Designed to be respectful, lawful, non-violent and inclusive for all learners.
+            </p>
+          </div>
+
+          <div id="promise-map" className="nebula-card p-5 md:p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-pathshala-gold">Promise Map</p>
+                <h3 className="text-2xl font-black bengali-text">৭টি অঙ্গীকার</h3>
+              </div>
+              <Leaf className="h-7 w-7 text-pathshala-emerald" />
+            </div>
+
+            <div className="grid gap-3">
+              {QUESTIONS.map((q) => {
+                const Icon = q.icon;
+                return (
+                  <div key={q.id} className="rounded-2xl border border-border/40 bg-background/30 p-4 transition hover:bg-background/50">
+                    <div className="flex items-start gap-3">
+                      <div className={`rounded-2xl bg-gradient-to-br ${q.gradient} p-3 text-white shadow-lg shrink-0`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="font-bold bengali-text">{q.bn}</h4>
+                          <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[10px] text-muted-foreground">{q.weight}%</span>
+                        </div>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground bengali-text">{q.promise}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === "quiz" && (
+        <div className="mx-auto w-full max-w-3xl nebula-card p-5 md:p-8">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <button
+              onClick={back}
+              className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground transition hover:bg-muted/40"
+            >
+              <ChevronLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="text-right">
+              <p className="text-xs font-bold text-muted-foreground">Progress</p>
+              <p className="text-lg font-black">{progress}%</p>
+            </div>
+          </div>
+
+          <div className="mb-6 h-2.5 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-sky-500 to-violet-500 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className={`rounded-2xl border ${active.border} ${active.softBg} p-5 text-slate-800`}>
+            <div className="flex items-start gap-4">
+              <div className={`rounded-2xl bg-gradient-to-br ${active.gradient} p-3.5 text-white shadow-lg shrink-0`}>
+                <ActiveIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <p className={`text-xs font-black uppercase tracking-wide ${active.text}`}>{active.en}</p>
+                <h3 className="mt-1 text-2xl md:text-3xl font-black bengali-text">{active.bn}</h3>
+                <p className="mt-2 leading-7 text-slate-600 bengali-text">{active.description}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <p className="text-xs font-bold text-muted-foreground">Question {index + 1} of {QUESTIONS.length}</p>
+            <h4 className="mt-2 text-xl md:text-2xl font-black leading-snug bengali-text">{active.question}</h4>
+
+            <div className="mt-4 grid gap-3">
+              {active.options.map((option) => {
+                const selected = selectedValue === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => setAnswers((p) => ({ ...p, [active.id]: option.value }))}
+                    className={`flex items-center justify-between rounded-2xl border p-4 text-left transition ${
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground shadow-xl"
+                        : "border-border bg-background/40 text-foreground hover:-translate-y-0.5 hover:bg-muted/40"
+                    }`}
+                  >
+                    <span className="font-bold bengali-text">{option.label}</span>
+                    {selected
+                      ? <CheckCircle2 className="h-5 w-5" />
+                      : <span className="text-xs font-black text-muted-foreground">+{option.value}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-muted/30 p-4">
+            <input
+              type="checkbox"
+              checked={!!promises[active.id]}
+              onChange={(e) => setPromises((p) => ({ ...p, [active.id]: e.target.checked }))}
+              className="mt-1 h-5 w-5 rounded border-border accent-primary"
+            />
+            <span>
+              <span className="block font-black">Today&apos;s promise</span>
+              <span className="block text-sm leading-6 text-muted-foreground bengali-text">{active.promise}</span>
+            </span>
+          </label>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">Promise bonus adds a small boost — real score comes from daily habits.</p>
+            <button
+              onClick={next}
+              disabled={selectedValue === undefined}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-sky-600 px-6 py-3.5 font-black text-white shadow-xl transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+            >
+              {index === QUESTIONS.length - 1 ? "Show result" : "Next"}
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {screen === "result" && (
+        <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+          <div className="nebula-card p-6 md:p-8 text-center">
+            <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-emerald-500 via-sky-500 to-violet-600 text-5xl shadow-xl">
+              {level.emoji}
+            </div>
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-muted-foreground">Your Hadi Meter</p>
+            <h3 className="mt-2 text-3xl md:text-4xl font-black bengali-text text-gradient-gold">{level.bn}</h3>
+            <p className="mt-1 text-base font-bold text-muted-foreground">{level.en}</p>
+
+            <div className="relative mx-auto mt-7 h-52 w-52">
+              <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" stroke="hsl(var(--muted))" strokeWidth="10" fill="none" />
+                <circle
+                  cx="60" cy="60" r="52" stroke="url(#hmGrad)" strokeWidth="10" strokeLinecap="round"
+                  fill="none" strokeDasharray={`${(score / 100) * 326.73} 326.73`}
+                />
+                <defs>
+                  <linearGradient id="hmGrad" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="50%" stopColor="#0ea5e9" />
+                    <stop offset="100%" stopColor="#7c3aed" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-5xl font-black">{score}</span>
+                <span className="text-xs font-bold text-muted-foreground">out of 100</span>
+              </div>
+            </div>
+
+            <p className="mt-5 rounded-2xl bg-muted/40 p-4 text-left leading-7 text-muted-foreground bengali-text">{level.message}</p>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 text-left">
+              <MiniInsight icon={Trophy} label="Strongest" value={strongest?.bn || "—"} />
+              <MiniInsight icon={Target} label="Focus next" value={weakest?.bn || "—"} />
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <button onClick={shareResult} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground px-4 py-3 font-bold transition hover:opacity-90">
+                <Share2 className="h-4 w-4" /> Share
+              </button>
+              <button onClick={copyResult} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border px-4 py-3 font-bold text-foreground transition hover:bg-muted/40">
+                <Copy className="h-4 w-4" /> {copied ? "Copied" : "Copy"}
+              </button>
+              <button onClick={reset} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border px-4 py-3 font-bold text-foreground transition hover:bg-muted/40">
+                <RefreshCw className="h-4 w-4" /> Retry
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="nebula-card p-6 md:p-8">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-pathshala-emerald">Breakdown</p>
+                  <h3 className="text-2xl font-black bengali-text">মাত্রাভিত্তিক বিশ্লেষণ</h3>
+                </div>
+                <Award className="h-7 w-7 text-pathshala-gold" />
+              </div>
+
+              <div className="space-y-4">
+                {dimensionScores.map((q) => {
+                  const Icon = q.icon;
+                  const finalValue = clamp((answers[q.id] ?? 0) + (promises[q.id] ? 4 : 0));
+                  return (
+                    <div key={q.id}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`rounded-xl bg-gradient-to-br ${q.gradient} p-2 text-white`}>
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="font-black bengali-text">{q.bn}</p>
+                            <p className="text-[11px] font-semibold text-muted-foreground">{q.en} · weight {q.weight}%</p>
+                          </div>
+                        </div>
+                        <span className="font-black tabular-nums">{finalValue}%</span>
+                      </div>
+                      <div className="h-2.5 overflow-hidden rounded-full bg-muted">
+                        <div className={`h-full rounded-full bg-gradient-to-r ${q.gradient}`} style={{ width: `${finalValue}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="nebula-card p-6 md:p-8">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-sky-500">Action Plan</p>
+                  <h3 className="text-2xl font-black bengali-text">৭ দিনের ছোট চ্যালেঞ্জ</h3>
+                </div>
+                <CheckCircle2 className="h-7 w-7 text-sky-500" />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                {checkedPromises.map((q) => (
+                  <div key={q.id} className={`rounded-2xl border ${q.border} ${q.softBg} p-4 text-slate-800`}>
+                    <p className={`text-[11px] font-black uppercase tracking-wide ${q.text}`}>{q.en}</p>
+                    <p className="mt-1 text-sm font-bold leading-6 bengali-text">{q.promise}</p>
+                  </div>
+                ))}
+              </div>
+
+              {!allAnswered && (
+                <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
+                  You skipped some questions. For the most accurate result, retry and answer all dimensions.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </NebulaShell>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-background/40 backdrop-blur p-4">
+      <p className="text-2xl font-black">{value}</p>
+      <p className="text-xs font-bold text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
+function MiniInsight({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-background/40 backdrop-blur p-4">
+      <Icon className="mb-2 h-4 w-4 text-muted-foreground" />
+      <p className="text-[10px] font-black uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 font-black bengali-text">{value}</p>
+    </div>
+  );
+}

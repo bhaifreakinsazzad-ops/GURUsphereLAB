@@ -1,113 +1,118 @@
+## Goal
 
+Three connected upgrades to Hadi Wishes / GURU'sphere:
 
-## Hadi Wishes — Full Rebrand Plan
+1. **Hadi Meter Pro** — replace the existing 5-minute SJT with the new positive, values-based 7-promise Promise Calculator (uploaded `HadiMeterPro.jsx`).
+2. **Weekly Learning Missions** — bonus-XP goals on the Dashboard.
+3. **Course Progress Tracking** — completion %, next lesson, and time-spent for enrolled courses.
 
-A complete, emotional rebrand of the platform in honor of Shaheed Osman Hadi, transforming it into a free knowledge sanctuary for Bangladeshi students who can't afford expensive education.
-
-### The Vision (Distilled)
-
-**"Hadi Wishes"** — a living memorial that does what he wished he could do: give every curious Bangladeshi student free access to the things that are normally locked behind paywalls. Research papers, premium courses, expensive software tutorials, certifications, books — all free, all curated.
-
-Tagline: **"যা সে চেয়েছিল — তোমার জন্য খোলা।"** *(What he wished for — opened for you.)*
+All work is client-side (localStorage); no DB migration needed. The `/hadi-meter` route already exists and is wired through nav/CTAs, so this is mostly a content-and-mechanics swap rather than a new route.
 
 ---
 
-### What Changes (Rebrand Scope)
+## 1. Hadi Meter Pro (replaces current `/hadi-meter`)
 
-**Identity layer (every page):**
-- Replace "GURU'sphere Lab" → **"Hadi Wishes"** in Navbar, Footer, App.tsx loader, index.html title/OG/JSON-LD, 404 page
-- Add a subtle memorial line in the footer: *"In loving memory of Shaheed Osman Hadi (১৯৯৮–২০২৪) — তাঁর স্বপ্ন, আমাদের পথ।"*
-- Keep the existing color palette, glassmorphism, Bengali-English bilingual feel — design stays, soul deepens
+**Why replace:** The current Hadi Meter is an SJT with combative wording ("গুলি কর, তবু মাথা নোয়াবো না", time-penalty timer). The new requirement is positive, inclusive, lawful, non-violent, growth-focused — incompatible with the old questions. Cleanest path is to swap the page contents.
 
-**Hero rewrite:**
-- New headline: *"The Wishes He Left Behind."*
-- Sub: *"Free research, free courses, free tools — everything Bangladesh's curious students were told they couldn't afford. Open. Forever."*
-- Stats updated: "Forever Free • Curated for Bangladesh • Built on His Wish"
+**Files**
+- Rewrite `src/pages/HadiMeter.tsx` from the uploaded `HadiMeterPro.jsx`, adapted to TypeScript + project conventions:
+  - Replace raw `<main className="bg-slate-950 ...">` with `NebulaShell` so the page inherits the Hadi Wishes deep-green / glass aesthetic, navbar, and floating donate CTA.
+  - Keep the 3-screen flow: intro → quiz (one question at a time) → result.
+  - Keep all 7 dimensions, weights, options, level tiers, share/copy/retry exactly as in the upload.
+  - Result screen keeps: score/100 ring, level title, strongest, focus-next, dimension breakdown bars, 7-day action plan, Share / Copy / Retry.
+  - Use `lucide-react` icons already imported in the upload.
+  - Add page `<title>` via a small `useEffect` setting `document.title = "Hadi Meter | GURU'sphere"`.
+  - Remove the SJT timer, html2canvas download, Facebook share, and combative copy entirely.
+- Add a small safety footer: *"This is a self-reflection tool, not an official certification."*
+- Hook into learner history: when a learner reaches the result screen, call `recordAttempt(...)` (subject `"Hadi Meter"`, `practice: true`, `xp = Math.round(score / 4)`) so it shows on Dashboard activity but does not inflate ranked XP.
 
----
+**Navigation**
+- `src/components/Navbar.tsx` — add `{ label: "Hadi Meter", href: "/hadi-meter", route: true }` to `navItems` (desktop + mobile menus already iterate this list).
+- Homepage CTA: add a compact card row inside `src/components/UniqueFeatures.tsx` (or a new banner above it) titled **"Try Hadi Meter — Calculate your 7 promises."** linking to `/hadi-meter`. Bilingual: Bengali subtitle "তোমার ৭টি অঙ্গীকার মাপো — ২ মিনিটে।"
 
-### New Sections Added (Reusing Existing Patterns)
-
-**1. Research Hub** (new section after ClassroomSection)
-Curated free access points — arXiv, MIT OCW papers, Google Scholar shortcuts, Sci-Hub alternatives (legal: CORE, Unpaywall, DOAJ), Bengali academic archives. 6–8 cards, each linking to a real free resource.
-
-**2. Free Courses Library** (replaces/extends existing LibrarySection)
-Real curated catalog — MIT OpenCourseWare, Khan Academy Bangla, freeCodeCamp, CS50, Coursera financial aid guide, Stanford Online, fast.ai. Each card = one expensive thing made free. Bengali subtitles per course type.
-
-**3. Premium-Free Tools** (new section)
-Things normally costly to BD students: GitHub Student Pack, JetBrains Education, Figma Education, Notion Education, Adobe alternatives (GIMP/Krita/DaVinci), Cloudflare/Vercel free tiers. Each card explains *what's normally paid* and *how to get it free*.
-
-**4. Open Source Projects** (new section)
-"Build with the world." — Curated beginner-friendly OSS (First Contributions, Good First Issues, Hacktoberfest), plus a placeholder for community projects we'll host later.
-
-**5. Community / Discussion** (lightweight for now)
-Discord/Telegram CTA card + "Coming Soon" forum tease. No backend yet — just a join link placeholder.
-
-**Existing sections kept & gently rethemed:**
-- Knowledge Tree → reframed as *"His Tree of Wishes"* (each branch = one wish fulfilled)
-- Exam Arena & Hadi Meter → kept as-is (already on-brand)
-- Clubs → kept, slight copy refresh
-- Footer → memorial line + email signup retained
+**Tech notes**
+- Convert JSX to TSX: type `Stat`, `MiniInsight` props, the `screen` union (`"intro" | "quiz" | "result"`), `answers` as `Record<string, number>`, etc.
+- Tailwind classes used (`from-emerald-500`, `bg-slate-950`, `from-emerald-600 to-sky-600`) already work via the existing Tailwind config; no theme changes required.
+- Keep questions/promise text in Bangla per the upload — fits the project's Bengali-first rule for cultural/decorative copy.
 
 ---
 
-### Files to Modify
+## 2. Weekly Learning Missions
 
-| File | Change |
-|------|--------|
-| `index.html` | Title, meta, OG, JSON-LD → "Hadi Wishes" |
-| `src/components/Navbar.tsx` | Brand name + tagline chip |
-| `src/components/HeroSection.tsx` | Full copy rewrite |
-| `src/components/LibrarySection.tsx` | Replace book data with real free-course catalog |
-| `src/components/FooterSection.tsx` | Brand name + memorial line |
-| `src/components/KnowledgeTreeSection.tsx` | Light copy reframe |
-| `src/components/ClubsSection.tsx` | Light copy refresh |
-| `src/pages/Index.tsx` | Add 3 new sections in order |
-| `src/pages/NotFound.tsx` | Rebrand |
-| `src/App.tsx` | Loader brand name |
+A rotating set of 4 bonus-XP missions per ISO week, completable from the Dashboard.
 
-### New Files to Create
+**New file** `src/lib/missions.ts`
+- `WEEKLY_MISSION_TEMPLATES` — 8–10 mission definitions, e.g.:
+  - *Take 3 ranked exams* (+50 XP)
+  - *Earn a certificate* (+40 XP)
+  - *Maintain a 3-day streak* (+30 XP)
+  - *Try Hadi Meter once* (+20 XP)
+  - *Save a new course* (+20 XP)
+  - *Submit a research topic* (+50 XP)
+  - *Post a memorial note* (+15 XP)
+  - *Score ≥ 80% on any exam* (+40 XP)
+- `getCurrentWeekKey()` → `"2026-W18"` (ISO week)
+- `getWeeklyMissions(weekKey)` — deterministically picks 4 templates per week (seeded by week key) so the set is stable for the whole week.
+- `evaluateMissions(week, attempts, certs, savedWishesCount, contributionCounts)` — returns each mission with `{ progress, target, completed }`. Pure function; reads from `learnerHistory` + counts already loaded in Dashboard.
+- `claimMission(weekKey, missionId)` and `getClaimed(weekKey)` — persist claimed bonus XP in `localStorage` under `gs_missions_v1`.
+- `getMissionBonusXp()` — sum of all claimed bonuses across all weeks; added to `totalXp` in Dashboard.
 
-- `src/components/ResearchHubSection.tsx` — 6 curated research portals
-- `src/components/PremiumFreeToolsSection.tsx` — 6–8 normally-paid tools made free
-- `src/components/OpenSourceSection.tsx` — beginner-friendly OSS entry points
-- `src/components/MemorialBadge.tsx` — small reusable "In his memory" component used in hero + footer
-
-### Page Order (new `Index.tsx`)
-
-```text
-Navbar
-HeroSection                  (rewritten)
-ClassroomSection             (kept)
-ResearchHubSection           (NEW)
-LibrarySection               (rewritten as Free Courses)
-PremiumFreeToolsSection      (NEW)
-ExamSection                  (kept)
-KnowledgeTreeSection         (light reframe)
-OpenSourceSection            (NEW)
-UniqueFeatures               (kept)
-ClubsSection                 (light refresh)
-FooterSection                (rewritten with memorial)
-```
+**Dashboard changes** (`src/pages/Dashboard.tsx`)
+- New section **"This week's missions"** (under the top stats row, before "My Enrolled Courses"):
+  - 4 mission cards in a 2-col grid, each showing icon, title, progress bar (`progress / target`), XP reward chip, and a **Claim +XP** button enabled only when completed and not yet claimed.
+  - Header shows the week label + days remaining until reset.
+- Toast on claim ("+40 XP claimed!"), updates `totalXp` immediately.
+- Include `missionBonusXp` in the `totalXp` calculation that drives Level/Progress.
 
 ---
 
-### Credit-Efficiency Strategy
+## 3. Course Progress Tracking
 
-- **One implementation pass.** All file edits done in a single batched session — no exploratory coding.
-- **No new dependencies.** Reuse framer-motion, lucide-react, existing glass-card/gradient utilities. Zero installs.
-- **No backend.** All curated links are static `const` arrays — no Supabase, no DB, no auth in this pass.
-- **Reuse patterns.** New sections clone the structure of `ClassroomSection` / `ClubsSection` — same `feature-card`, `ScrollReveal`, grid layouts.
-- **Skip the video re-analysis.** Working from your distilled brief (research + learn + free expensive things) — no extra tool calls.
+Track per-enrolled-course completion %, next lesson, and time spent. All client-side, keyed off `saved_wishes.wish_key`.
+
+**New file** `src/lib/courseProgress.ts`
+- Storage key `gs_course_progress_v1` shaped as:
+  ```ts
+  Record<wishKey, {
+    lessonsTotal: number;     // default 10 if unknown
+    lessonsDone: number;
+    nextLesson: string;       // free-text label, default "Lesson 1"
+    minutesSpent: number;
+    lastOpened: string;       // ISO
+  }>
+  ```
+- Helpers: `getProgress(key)`, `setProgress(key, patch)`, `tickMinutes(key, n)`, `markLessonDone(key, label?)`, `summary()` (returns avg %, total minutes, courses-completed count for the dashboard header).
+
+**Dashboard changes** (`src/pages/Dashboard.tsx`, "My Enrolled Courses" section)
+- Each enrolled-course card now shows:
+  - Title (existing)
+  - **Progress bar** (`lessonsDone / lessonsTotal`) with `%` label
+  - **"Next: {nextLesson}"** line
+  - **Time spent**: `⏱ 1h 24m` formatted from `minutesSpent`
+  - Two small actions:
+    - **+1 lesson** — calls `markLessonDone()`, increments lessonsDone, advances next lesson label to `Lesson N+1`.
+    - **+15 min** — calls `tickMinutes(15)` to log study time.
+  - "Open" link (existing `wish_url`) — also calls `tickMinutes(5)` and updates `lastOpened` so just opening tracks engagement.
+- Add a roll-up stat card to the top stats row: **"Course Progress"** showing avg completion % across all enrolled courses + total study minutes.
+- Add a small in-card pill **"Completed ✓"** when `lessonsDone >= lessonsTotal`, and award a one-time +25 XP via the missions/bonus store.
 
 ---
 
-### Future Suggestions (post-launch)
+## Acceptance checklist
 
-1. **User accounts (Lovable Cloud)** → save favorite resources, track which wishes you've claimed
-2. **Community submissions** → let students suggest new free resources via a form
-3. **"Wish of the Week"** → rotating featured free course/tool on hero
-4. **Bengali translation toggle** → full BN/EN switch instead of mixed
-5. **Memorial wall** → user-submitted notes/dedications to Hadi
-6. **Course progress tracker** → mark courses started/completed locally (localStorage first, Cloud later)
+- `/hadi-meter` shows the new positive Promise Calculator (7 dimensions, intro → quiz → result, share / copy / retry, bilingual). No combative wording, no countdown timer, no html2canvas dependency on this page.
+- Document title = `Hadi Meter | GURU'sphere`. Safety disclaimer visible.
+- Navbar has a "Hadi Meter" link (desktop + mobile). Homepage shows a CTA "Try Hadi Meter — Calculate your 7 promises."
+- Dashboard shows a "This week's missions" section with 4 missions, live progress, and working Claim buttons that grant bonus XP.
+- "My Enrolled Courses" cards each show progress bar, next lesson, time spent, and `+1 lesson` / `+15 min` controls.
+- Top stats row includes a Course Progress card alongside Level / Streak / Ranked XP / Heatmap.
+- All new logic is client-side (localStorage); no schema changes.
+- TypeScript build passes.
 
+---
+
+## Out of scope
+
+- Server-side persistence / cross-device sync of missions and course progress (still localStorage like existing learner history).
+- New Supabase tables.
+- Real lesson content / video player — we're tracking progress against externally-linked courses (the `wish_url`), which matches the current "enroll = save wish" model.

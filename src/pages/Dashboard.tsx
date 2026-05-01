@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpen, Users, GraduationCap, Heart, Sparkles, FileText,
   Flame, Zap, Trophy, Award, TrendingUp, Calendar, ExternalLink,
+  Target, Clock, Plus, CheckCircle2, Gift,
 } from "lucide-react";
 import NebulaShell from "@/components/NebulaShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,14 @@ import {
   ExamAttempt, CertificateRecord,
   getAttempts, getCertificates, computeStreak, totalRankedXp, activityHeatmap,
 } from "@/lib/learnerHistory";
+import {
+  evaluateWeekly, claimMission, getCurrentWeekKey, daysLeftInWeek,
+  getMissionBonusXp, type EvaluatedMission,
+} from "@/lib/missions";
+import {
+  getProgress, tickMinutes, markLessonDone, markCompletedAwarded,
+  summary as courseSummary, formatMinutes, type CourseProgress,
+} from "@/lib/courseProgress";
 
 interface SavedWish {
   id: string;
@@ -97,6 +106,21 @@ const Dashboard = () => {
     else toast.success("Bio updated");
   };
 
+  /* ── Mission claim refresh tick ── */
+  const [missionTick, setMissionTick] = useState(0);
+  const bumpMissions = () => setMissionTick((n) => n + 1);
+
+  /* ── Per-course progress (local) ── */
+  const [progressMap, setProgressMap] = useState<Record<string, CourseProgress>>({});
+  const refreshProgress = (keys: string[]) => {
+    const next: Record<string, CourseProgress> = {};
+    keys.forEach((k) => { next[k] = getProgress(k); });
+    setProgressMap(next);
+  };
+  useEffect(() => {
+    refreshProgress(enrolled.map((e) => e.wish_key));
+  }, [enrolled]);
+
   /* ── Derived: XP, streak, ranking history ── */
   const examXp = useMemo(() => totalRankedXp(attempts), [attempts]);
   const contributionXp =
@@ -104,10 +128,65 @@ const Dashboard = () => {
     (counts?.projects ?? 0) * 30 +
     (counts?.notes ?? 0) * 5 +
     (counts?.submissions ?? 0) * 15;
-  const totalXp = examXp + contributionXp;
+  const missionXp = useMemo(() => getMissionBonusXp(), [missionTick]);
+  const totalXp = examXp + contributionXp + missionXp;
   const level = Math.floor(totalXp / 100) + 1;
   const streak = useMemo(() => computeStreak(attempts), [attempts]);
   const heatmap = useMemo(() => activityHeatmap(28, attempts), [attempts]);
+
+  /* ── Course progress roll-up ── */
+  const courseStats = useMemo(
+    () => courseSummary(enrolled.map((e) => e.wish_key)),
+    [enrolled, progressMap],
+  );
+
+  /* ── Weekly missions ── */
+  const weekKey = getCurrentWeekKey();
+  const evaluatedMissions: EvaluatedMission[] = useMemo(() => {
+    return evaluateWeekly({
+      attempts,
+      certs,
+      enrolledCount: enrolled.length,
+      contributions: {
+        research: counts?.research ?? 0,
+        projects: counts?.projects ?? 0,
+        notes: counts?.notes ?? 0,
+        submissions: counts?.submissions ?? 0,
+      },
+      weekStart: (() => { const d = new Date(); d.setUTCHours(0,0,0,0); const day=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-day); return d; })(),
+    }, weekKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempts, certs, enrolled.length, counts, weekKey, missionTick]);
+
+  const handleClaim = (m: EvaluatedMission) => {
+    if (!m.completed || m.claimed) return;
+    claimMission(m.template.id, m.template.xp, weekKey);
+    bumpMissions();
+    toast.success(`+${m.template.xp} XP claimed — ${m.template.title}`);
+  };
+
+  const handleLessonDone = (key: string) => {
+    const next = markLessonDone(key);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+    if (next.lessonsDone >= next.lessonsTotal && !next.completedAwarded) {
+      markCompletedAwarded(key);
+      // award one-time +25 XP via mission store under a synthetic key
+      claimMission(`course-complete-${key}`, 25, weekKey);
+      bumpMissions();
+      toast.success("Course complete! +25 XP awarded 🎉");
+    } else {
+      toast.success("Lesson logged");
+    }
+  };
+  const handleAddMinutes = (key: string, mins: number) => {
+    const next = tickMinutes(key, mins);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+    toast.success(`+${mins} min logged`);
+  };
+  const handleOpenCourse = (key: string) => {
+    const next = tickMinutes(key, 5);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+  };
 
   const rankedHistory = useMemo(() => {
     const ranked = attempts.filter((a) => !a.practice);
@@ -149,7 +228,7 @@ const Dashboard = () => {
       subtitle="Your courses, XP, certificates & ranking — all in one place."
     >
       {/* ── Top row: Level / Streak / XP ── */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5 mb-8">
         <div className="nebula-card p-6 md:col-span-1">
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Level</div>
           <div className="text-5xl font-bold text-gradient-gold">{level}</div>
@@ -203,6 +282,76 @@ const Dashboard = () => {
             {streak.lastActive ? `Last active ${streak.lastActive}` : "No activity yet — start today!"}
           </p>
         </div>
+
+        {/* Course Progress roll-up */}
+        <div className="nebula-card p-6 md:col-span-1 col-span-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-1">
+            <BookOpen size={13} className="text-primary" /> Course Progress
+          </div>
+          <div className="text-5xl font-bold text-gradient-green tabular-nums">{courseStats.avgPercent}%</div>
+          <div className="text-sm text-muted-foreground mt-2">
+            avg across {enrolled.length} course{enrolled.length === 1 ? "" : "s"}
+          </div>
+          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1"><Clock size={11} /> {formatMinutes(courseStats.totalMinutes)}</span>
+            <span className="inline-flex items-center gap-1"><CheckCircle2 size={11} /> {courseStats.completed} done</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Weekly Missions ── */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Target size={18} className="text-pathshala-emerald" /> This week&apos;s missions
+            <span className="text-xs font-normal text-muted-foreground bengali-text ml-1">সাপ্তাহিক লক্ষ্য</span>
+          </h2>
+          <span className="text-xs text-muted-foreground">
+            Resets in {daysLeftInWeek()} day{daysLeftInWeek() === 1 ? "" : "s"} · {weekKey}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {evaluatedMissions.map((m) => {
+            const pct = Math.round((m.progress / m.template.target) * 100);
+            return (
+              <div key={m.template.id} className="nebula-card p-5">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold leading-snug">{m.template.title}</h3>
+                    <p className="bengali-text text-xs text-muted-foreground mt-0.5">{m.template.bengali}</p>
+                  </div>
+                  <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-pathshala-gold/15 text-pathshala-gold text-[11px] font-bold px-2 py-1">
+                    <Gift size={11} /> +{m.template.xp} XP
+                  </span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-pathshala-emerald to-primary"
+                    style={{ width: `${Math.min(100, pct)}%` }}
+                  />
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground tabular-nums">
+                    {m.progress} / {m.template.target}
+                  </span>
+                  {m.claimed ? (
+                    <span className="inline-flex items-center gap-1 text-pathshala-emerald font-semibold">
+                      <CheckCircle2 size={12} /> Claimed
+                    </span>
+                  ) : (
+                    <button
+                      disabled={!m.completed}
+                      onClick={() => handleClaim(m)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition"
+                    >
+                      Claim +{m.template.xp}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Enrolled courses ── */}
@@ -220,23 +369,68 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {enrolled.map((w) => {
-              const inner = (
-                <>
-                  <div className="text-[10px] uppercase tracking-wider text-pathshala-gold mb-2">{w.wish_type}</div>
-                  <h3 className="font-semibold leading-snug mb-3 line-clamp-2">{w.wish_title}</h3>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{new Date(w.created_at).toLocaleDateString()}</span>
-                    {w.wish_url && <ExternalLink size={13} className="text-primary" />}
+              const p = progressMap[w.wish_key] ?? getProgress(w.wish_key);
+              const pct = Math.round((p.lessonsDone / Math.max(p.lessonsTotal, 1)) * 100);
+              const completed = p.lessonsDone >= p.lessonsTotal && p.lessonsTotal > 0;
+              return (
+                <div key={w.id} className="nebula-card p-5 flex flex-col">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[10px] uppercase tracking-wider text-pathshala-gold">{w.wish_type}</div>
+                    {completed && (
+                      <span className="text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pathshala-emerald/15 text-pathshala-emerald font-bold">
+                        <CheckCircle2 size={10} /> Completed
+                      </span>
+                    )}
                   </div>
-                </>
-              );
-              return w.wish_url ? (
-                <a key={w.id} href={w.wish_url} target="_blank" rel="noopener noreferrer"
-                  className="nebula-card p-5 hover:scale-[1.02] transition-transform block">
-                  {inner}
-                </a>
-              ) : (
-                <div key={w.id} className="nebula-card p-5">{inner}</div>
+                  <h3 className="font-semibold leading-snug mb-3 line-clamp-2">{w.wish_title}</h3>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="font-semibold text-foreground tabular-nums">{pct}%</span>
+                      <span className="text-muted-foreground tabular-nums">
+                        {p.lessonsDone}/{p.lessonsTotal} lessons
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-pathshala-gold-light"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="truncate pr-2">Next: <span className="text-foreground font-medium">{p.nextLesson}</span></span>
+                      <span className="inline-flex items-center gap-1 shrink-0"><Clock size={11} /> {formatMinutes(p.minutesSpent)}</span>
+                    </div>
+
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => handleLessonDone(w.wish_key)}
+                        disabled={completed}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-primary/15 text-primary hover:bg-primary/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Plus size={11} /> Lesson
+                      </button>
+                      <button
+                        onClick={() => handleAddMinutes(w.wish_key, 15)}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-muted/60 text-foreground hover:bg-muted transition"
+                      >
+                        <Clock size={11} /> +15 min
+                      </button>
+                      {w.wish_url && (
+                        <a
+                          href={w.wish_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => handleOpenCourse(w.wish_key)}
+                          className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-pathshala-emerald/15 text-pathshala-emerald hover:bg-pathshala-emerald/25 transition"
+                        >
+                          Open <ExternalLink size={11} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>

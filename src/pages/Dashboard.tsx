@@ -106,6 +106,21 @@ const Dashboard = () => {
     else toast.success("Bio updated");
   };
 
+  /* ── Mission claim refresh tick ── */
+  const [missionTick, setMissionTick] = useState(0);
+  const bumpMissions = () => setMissionTick((n) => n + 1);
+
+  /* ── Per-course progress (local) ── */
+  const [progressMap, setProgressMap] = useState<Record<string, CourseProgress>>({});
+  const refreshProgress = (keys: string[]) => {
+    const next: Record<string, CourseProgress> = {};
+    keys.forEach((k) => { next[k] = getProgress(k); });
+    setProgressMap(next);
+  };
+  useEffect(() => {
+    refreshProgress(enrolled.map((e) => e.wish_key));
+  }, [enrolled]);
+
   /* ── Derived: XP, streak, ranking history ── */
   const examXp = useMemo(() => totalRankedXp(attempts), [attempts]);
   const contributionXp =
@@ -113,10 +128,65 @@ const Dashboard = () => {
     (counts?.projects ?? 0) * 30 +
     (counts?.notes ?? 0) * 5 +
     (counts?.submissions ?? 0) * 15;
-  const totalXp = examXp + contributionXp;
+  const missionXp = useMemo(() => getMissionBonusXp(), [missionTick]);
+  const totalXp = examXp + contributionXp + missionXp;
   const level = Math.floor(totalXp / 100) + 1;
   const streak = useMemo(() => computeStreak(attempts), [attempts]);
   const heatmap = useMemo(() => activityHeatmap(28, attempts), [attempts]);
+
+  /* ── Course progress roll-up ── */
+  const courseStats = useMemo(
+    () => courseSummary(enrolled.map((e) => e.wish_key)),
+    [enrolled, progressMap],
+  );
+
+  /* ── Weekly missions ── */
+  const weekKey = getCurrentWeekKey();
+  const evaluatedMissions: EvaluatedMission[] = useMemo(() => {
+    return evaluateWeekly({
+      attempts,
+      certs,
+      enrolledCount: enrolled.length,
+      contributions: {
+        research: counts?.research ?? 0,
+        projects: counts?.projects ?? 0,
+        notes: counts?.notes ?? 0,
+        submissions: counts?.submissions ?? 0,
+      },
+      weekStart: (() => { const d = new Date(); d.setUTCHours(0,0,0,0); const day=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-day); return d; })(),
+    }, weekKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempts, certs, enrolled.length, counts, weekKey, missionTick]);
+
+  const handleClaim = (m: EvaluatedMission) => {
+    if (!m.completed || m.claimed) return;
+    claimMission(m.template.id, m.template.xp, weekKey);
+    bumpMissions();
+    toast.success(`+${m.template.xp} XP claimed — ${m.template.title}`);
+  };
+
+  const handleLessonDone = (key: string) => {
+    const next = markLessonDone(key);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+    if (next.lessonsDone >= next.lessonsTotal && !next.completedAwarded) {
+      markCompletedAwarded(key);
+      // award one-time +25 XP via mission store under a synthetic key
+      claimMission(`course-complete-${key}`, 25, weekKey);
+      bumpMissions();
+      toast.success("Course complete! +25 XP awarded 🎉");
+    } else {
+      toast.success("Lesson logged");
+    }
+  };
+  const handleAddMinutes = (key: string, mins: number) => {
+    const next = tickMinutes(key, mins);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+    toast.success(`+${mins} min logged`);
+  };
+  const handleOpenCourse = (key: string) => {
+    const next = tickMinutes(key, 5);
+    setProgressMap((p) => ({ ...p, [key]: next }));
+  };
 
   const rankedHistory = useMemo(() => {
     const ranked = attempts.filter((a) => !a.practice);

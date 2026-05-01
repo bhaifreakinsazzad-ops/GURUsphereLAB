@@ -49,6 +49,33 @@ const UniqueFeatures = () => {
           </div>
         </ScrollReveal>
 
+        <ScrollReveal>
+          <Link
+            to="/hadi-meter"
+            className="group block mb-8 rounded-3xl p-6 md:p-8 border border-pathshala-gold/30 bg-gradient-to-br from-pathshala-emerald/15 via-background/40 to-pathshala-gold/15 backdrop-blur transition hover:-translate-y-0.5 hover:border-pathshala-gold/60"
+          >
+            <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-6">
+              <div className="shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-emerald-500 to-sky-600 text-white shadow-lg">
+                <Sparkles size={24} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold tracking-widest uppercase text-pathshala-gold mb-1">
+                  GURU&apos;sphere Interactive Lab
+                </p>
+                <h3 className="text-xl md:text-2xl font-bold leading-snug">
+                  Try Hadi Meter — Calculate your 7 promises.
+                </h3>
+                <p className="bengali-text text-sm md:text-base text-muted-foreground mt-1">
+                  তোমার ৭টি অঙ্গীকার মাপো — মাত্র ২ মিনিটে।
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-2 rounded-2xl bg-primary text-primary-foreground px-5 py-3 font-bold text-sm shadow-lg group-hover:translate-x-1 transition self-start md:self-auto">
+                Start now <ChevronRight size={16} />
+              </span>
+            </div>
+          </Link>
+        </ScrollReveal>
+
         <div className="grid md:grid-cols-2 gap-6">
           {features.map((feature, i) => (
             <ScrollReveal key={feature.title} delay={i * 0.1}>

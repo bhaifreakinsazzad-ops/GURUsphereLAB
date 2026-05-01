@@ -1,95 +1,101 @@
-## Goal
+# Plan: Classroom Room, Auto-Certificates, Topic Leaderboard, Clubs Landing
 
-Layer a futuristic "GURU'sphere Lab" experience on top of the existing editorial Hadi Wishes site — without breaking any route, auth flow, Supabase logic, or the warm gold/green identity that already ships. All work is **additive**.
+All four features are client-side and follow the existing GURU'sphere lab + editorial visual language. No new tables required; uses `localStorage` for persistence (matches existing pattern in `learnerHistory.ts`, `missions.ts`, `courseProgress.ts`).
 
-## Important calibration
+---
 
-The reference files request a pure cold neon palette (#0a0a0a + cyan + crimson). The live site uses a warm editorial palette (deep navy + candle gold + Bangladesh red + emerald). Replacing it would destroy brand equity and conflict with stored design memory. Instead I will introduce a **scoped "lab" theme** (cyan + violet accents on the existing dark background) that lives only inside new lab sections — homepage editorial flow stays intact.
+## 1. Live Classroom Room (`/classroom/:subjectId`)
 
-## What gets built
+A simulated live room reachable from the existing `ClassroomSection` "subject planet" cards. Mobile-first, no real WebRTC needed for MVP.
 
-### 1. New shared UI primitives (`src/components/lab/`)
-- `GlassCard.tsx` — `bg-white/5 backdrop-blur-xl border border-white/10`, optional glow color prop
-- `GlowButton.tsx` — cyan/violet/gold variants with hover shadow halo
-- `LabSectionHeader.tsx` — bilingual eyebrow + title
+**New page** `src/pages/ClassroomRoom.tsx` with three panels (stacked on mobile, 3-col on desktop):
+- **Teacher video panel** — large 16:9 placeholder (gradient + subject icon, "Live" pulse dot, mute/camera toggle stubs, viewer count). Embeds an HTML5 `<video>` with a sample subject loop or a static cover so the layout works without a stream.
+- **Live chat panel** — messages stored in `localStorage` keyed by subject; you type a message, it appears with your display name + a few seeded "classmate" replies on a timer. Profanity filter via simple wordlist. Bilingual placeholder.
+- **Scheduled exam mode** — a banner + countdown to the next "exam window" (e.g. 10 min from join). When the window opens, a "Enter Exam" button deep-links to `/exam-arena?cat=<subject>&live=1`. On exit the room logs an attendance entry to `learnerHistory`.
 
-### 2. Learning Path section (`src/components/lab/LearningPathSection.tsx`)
-Mounted on homepage between `KnowledgeTreeSection` and Letter 04.
-- 7 nodes: Political Science, Literature, Cinema, Art, Theater, History, Digital Responsibility (Bangla + English labels)
-- **Default rendering: lightweight SVG constellation** (animated glowing nodes + connecting lines via Framer Motion). Fast, mobile-safe, zero new deps.
-- Click/tap node → glass overlay (Radix Dialog already in project) with topic description + "Start this path" CTA linking to existing routes (`/research-archive`, `/team-projects`, `/exam-arena`) or hash anchors.
-- Honors `prefers-reduced-motion`.
-- **No `@react-three/fiber` install** in this pass — keeps bundle small and avoids React 19 risk noted in repo guidance. We can add real 3D later behind a lazy import if you want; flagged as follow-up.
+**Edits**:
+- `src/components/ClassroomSection.tsx` — wrap each subject card in `<Link to={"/classroom/" + id}>` and add an "Enter Room" CTA; keep the orbiting visual.
+- `src/App.tsx` — add lazy `/classroom/:subjectId` route.
+- `src/components/Navbar.tsx` — add "Live Room" link under Classroom.
 
-### 3. Hadi Meter upgrade (`src/pages/HadiMeter.tsx`)
-Keep the existing 7-dimension Promise Calculator logic intact (Learning, Integrity, Moral Courage, Service, Unity, Discipline, Digital Responsibility — already matches the brief exactly). Upgrade the **results screen only**:
-- Add lazy-loaded `recharts` Radar chart (recharts already installed) showing the 7 dimensions
-- Keep existing bars as fallback below the radar
-- Keep score/level/strongest/focus/7-day plan/share/copy/retry
-- Keep the educational disclaimer
-- No change to scoring, storage, or `learnerHistory.recordAttempt` integration
+---
 
-### 4. CommunityGrid section (`src/components/lab/CommunityGrid.tsx`)
-Mounted on homepage just before `ClubsSection`.
-- Masonry-ish responsive grid (CSS columns) of glass cards linking to **existing routes only**: Live Classroom (`#classroom`), Library (`#library`), Hadi Meter (`/hadi-meter`), Learning Path (`#learning-path`), Research Archive (`/research-archive`), Team Projects (`/team-projects`), Mentorship (`/mentorship`), Memorial Wall (`#memorial`)
-- Hover lift, glow border tinted by category
+## 2. Auto-Certificate Generation After Exams
 
-### 5. Homepage integration (`src/pages/Index.tsx`)
-Add two imports and mount `<LearningPathSection id="learning-path" />` and `<CommunityGrid />` in the existing flow. No removals.
+Today the certificate UI only shows after the user clicks Download manually inside `CertificatePreview`. We will trigger it automatically once an exam ends with a passing score.
 
-### 6. Navigation (`src/components/Navbar.tsx`)
-Add one item: `Learning Path → /#learning-path`. Keep all five existing items (Research, Projects, Mentors, Hadi Meter, Memorial) and the Dashboard/Sign-in/Donate behavior untouched.
+**Edits**:
+- `src/pages/ExamArena.tsx` — when results screen mounts and `score / total >= 0.6` (and not practice), auto-render a hidden canvas via `renderCertificate` from `src/lib/certificate.ts`, auto-download a PNG, call `recordCertificate(...)`, and show a "🏅 Certificate earned" toast with a Share button. Sub-60% still shows the manual `CertificatePreview` for retry/practice.
+- `src/lib/certificate.ts` — add a `generateCertificateBlob()` helper returning a `Blob` for sharing.
+- New `src/lib/share.ts` — small wrapper around `navigator.share` (with file) and a clipboard fallback for desktop ("Copy share link" using the Dashboard certificates view).
+- `src/components/CertificatePreview.tsx` — add a "Share" button next to Download using the new helper.
 
-### 7. Hero CTAs (`src/components/HeroSection.tsx`)
-Append two ghost links next to existing "Light a candle" / "Keep his light burning":
-- "Try Hadi Meter" → `/hadi-meter`
-- "Explore the Archive" → `#learning-path`
+PDF: keep PNG as the default (canvas-native, no new deps). Add an optional "Save as PDF" button that wraps the canvas image in a single-page jsPDF. We'll add `jspdf` only if the user wants the PDF option (otherwise PNG is sufficient).
 
-Existing CTAs and styling preserved.
+---
 
-### 8. SEO (`index.html`)
-Append/refresh `<title>`, `<meta name="description">`, and OG tags to include "The School That Never Closes" wording. Existing metadata kept.
+## 3. Topic-Based Ranking Leaderboard (Safe / Non-Shaming)
 
-## What is explicitly NOT touched
+A new section in the Exam Arena and a small widget on the Dashboard.
 
-- `src/integrations/supabase/*`, `.env`, `supabase/config.toml`
-- `AuthContext`, `Auth.tsx`, `Dashboard.tsx`, `Admin.tsx`, `ExamArena.tsx`, exam/cert/learner-history logic
-- All existing letter pages, memorial wall, donation section, footer
-- Color tokens in `index.css` (lab cyan/violet added as new tokens, no overrides)
-- Any existing route
+**New** `src/components/TopicLeaderboard.tsx`:
+- Tabs per category (Math, Science, English, etc., from `CATEGORIES`).
+- Builds a per-topic leaderboard from `getAttempts()` (your own attempts) plus the existing seeded `LEADERBOARD` mapped to a topic mix.
+- **Safe-by-design rules** (this addresses "without shaming"):
+  - Show only **top 5** + your **percentile band** ("Top 25%" / "Top 50%" / "Climbing"), never an absolute rank below top 10.
+  - Display learner names as initials + first name only ("Rafiq H.") and never show 0-score or failed attempts.
+  - Highlight **personal bests / improvements** ("+12% vs last week") rather than comparisons to others.
+  - Toggle "Hide me" (stored in localStorage) to opt out of being shown.
+  - Encouraging copy in Bangla + English ("সবাই এগিয়ে যাচ্ছে — তুমিও পারবে").
 
-## Technical details
+**Edits**:
+- `src/pages/ExamArena.tsx` — add a "Topic Leaderboards" tab/section near the existing global leaderboard.
+- `src/pages/Dashboard.tsx` — add a compact "Your topic standings" card (3 best topics with percentile band + delta).
 
-```text
-src/components/lab/
-  GlassCard.tsx
-  GlowButton.tsx
-  LabSectionHeader.tsx
-  LearningPathSection.tsx     (SVG constellation + Radix Dialog overlay)
-  CommunityGrid.tsx
+---
 
-Modified (additive only):
-  src/index.css               (+ --lab-cyan, --lab-violet tokens, .glass-lab utility)
-  src/components/Navbar.tsx   (+ Learning Path link)
-  src/components/HeroSection.tsx (+ 2 secondary CTAs)
-  src/pages/Index.tsx         (+ 2 sections)
-  src/pages/HadiMeter.tsx     (+ lazy radar on results)
-  index.html                  (+ refreshed meta/OG)
+## 4. Clubs Landing Page (`/clubs`) with Waitlist + Matching Quiz
+
+Replaces the "Coming Soon" `ClubsSection` CTA with a real landing page.
+
+**New** `src/pages/Clubs.tsx` with three sections:
+1. **Hero** — bilingual headline, "Find your club" CTA scrolling to the quiz.
+2. **6 club cards** (reuses the data in `ClubsSection`) with description, mentor placeholder, and "Join Waitlist" buttons.
+3. **Matching quiz** (`src/components/clubs/ClubMatchQuiz.tsx`) — 5 multiple-choice questions (energy level, solo/group preference, creative vs analytical, weekly time, primary goal). Each option carries weights for the 6 clubs; the highest-scoring club is recommended on a result card with "Join the [X] waitlist" CTA.
+4. **Waitlist signup** (`src/components/clubs/ClubWaitlistForm.tsx`) — email + display name + chosen club. Saved to a new Supabase table.
+
+**New table** `club_waitlist` (migration):
 ```
+id uuid pk default gen_random_uuid()
+created_at timestamptz default now()
+email text not null
+display_name text
+club_slug text not null
+quiz_match text -- nullable, the recommended club
+notes text
+```
+RLS:
+- `INSERT` allowed for `public` with check: valid email regex, length limits, `club_slug` in known set.
+- `SELECT` only for `admin` role (use existing `has_role(auth.uid(), 'admin')`).
+- No `UPDATE` / `DELETE` for users.
 
-No new npm packages. Recharts, framer-motion, lucide-react, Radix Dialog, Tailwind already present.
+**Edits**:
+- `src/App.tsx` — add lazy `/clubs` route.
+- `src/components/ClubsSection.tsx` — keep on homepage but change "Coming Soon" CTA to `<Link to="/clubs">Join the waitlist →</Link>`.
+- `src/components/Navbar.tsx` — add "Clubs" link.
 
-## Acceptance
+---
 
-- All existing routes load identically
-- Homepage gains Learning Path + Community Grid sections
-- `/hadi-meter` results show a radar chart (with dimension-bar fallback if recharts fails to lazy-load)
-- Mobile (≤390px): constellation collapses to a tap-friendly card carousel using the same data
-- Lighthouse mobile score not regressed (no new heavy deps)
-- TypeScript passes
+## Technical Details
 
-## Follow-ups (not in this pass, ask if you want them)
+- Animation: continue using `framer-motion` (already installed).
+- Styling: reuse `src/components/lab/GlassCard.tsx`, `GlowButton.tsx`, `LabSectionHeader.tsx`; respect existing `--lab-cyan`/`--lab-violet` tokens for new lab sections and the editorial gold/green for homepage-adjacent surfaces (per memory).
+- Persistence: `localStorage` for chat/attendance/leaderboard opt-out (`gs_classroom_chat_v1`, `gs_lb_optout_v1`); Supabase for `club_waitlist` only.
+- No new heavy deps. Optional `jspdf` only if you want PDF certificates in addition to PNG — confirm before adding.
+- Type safety: types added next to each module; `tsc --noEmit` should pass.
+- Mobile-first: all panels stack under `md:`; chat panel uses sticky bottom input on mobile.
 
-- Real `@react-three/fiber` constellation behind a desktop-only lazy import
-- Particle ambient layer on hero
-- Bilingual i18n toggle
+## Open question (will ask after approval)
+
+- Certificates: PNG only (current), or also generate a PDF (adds `jspdf` ~50KB)?
+

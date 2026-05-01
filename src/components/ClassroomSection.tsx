@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
 import { Radio, Users, Globe, Sparkles } from "lucide-react";
 
 const subjects = [
-  { name: "Mathematics", bengali: "গণিত", color: "hsl(42 85% 55%)", icon: "∑" },
-  { name: "Science", bengali: "বিজ্ঞান", color: "hsl(162 80% 35%)", icon: "⚛" },
-  { name: "Literature", bengali: "সাহিত্য", color: "hsl(340 60% 55%)", icon: "✎" },
-  { name: "Technology", bengali: "প্রযুক্তি", color: "hsl(200 70% 50%)", icon: "⌘" },
-  { name: "Arts", bengali: "শিল্প", color: "hsl(280 50% 55%)", icon: "◎" },
-  { name: "History", bengali: "ইতিহাস", color: "hsl(25 70% 50%)", icon: "⏳" },
+  { id: "math",       name: "Mathematics", bengali: "গণিত",     color: "hsl(42 85% 55%)",  icon: "∑" },
+  { id: "science",    name: "Science",     bengali: "বিজ্ঞান",    color: "hsl(162 80% 35%)", icon: "⚛" },
+  { id: "literature", name: "Literature",  bengali: "সাহিত্য",    color: "hsl(340 60% 55%)", icon: "✎" },
+  { id: "technology", name: "Technology",  bengali: "প্রযুক্তি",   color: "hsl(200 70% 50%)", icon: "⌘" },
+  { id: "arts",       name: "Arts",        bengali: "শিল্প",     color: "hsl(280 50% 55%)", icon: "◎" },
+  { id: "history",    name: "History",     bengali: "ইতিহাস",    color: "hsl(25 70% 50%)",  icon: "⏳" },
 ];
 
 const ClassroomSection = () => {

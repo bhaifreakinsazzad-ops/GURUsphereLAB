@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpen, Users, GraduationCap, Heart, Sparkles, FileText,
   Flame, Zap, Trophy, Award, TrendingUp, Calendar, ExternalLink,
+  Target, Clock, Plus, CheckCircle2, Gift,
 } from "lucide-react";
 import NebulaShell from "@/components/NebulaShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,14 @@ import {
   ExamAttempt, CertificateRecord,
   getAttempts, getCertificates, computeStreak, totalRankedXp, activityHeatmap,
 } from "@/lib/learnerHistory";
+import {
+  evaluateWeekly, claimMission, getCurrentWeekKey, daysLeftInWeek,
+  getMissionBonusXp, type EvaluatedMission,
+} from "@/lib/missions";
+import {
+  getProgress, tickMinutes, markLessonDone, markCompletedAwarded,
+  summary as courseSummary, formatMinutes, type CourseProgress,
+} from "@/lib/courseProgress";
 
 interface SavedWish {
   id: string;

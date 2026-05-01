@@ -19,6 +19,8 @@ const TeamProjects = lazy(() => import("./pages/TeamProjects.tsx"));
 const Mentorship = lazy(() => import("./pages/Mentorship.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const ClassroomRoom = lazy(() => import("./pages/ClassroomRoom.tsx"));
+const Clubs = lazy(() => import("./pages/Clubs.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,8 @@ const App = () => (
               <Route path="/mentorship" element={<Suspense fallback={<LoadingFallback />}><Mentorship /></Suspense>} />
               <Route path="/dashboard" element={<Suspense fallback={<LoadingFallback />}><Dashboard /></Suspense>} />
               <Route path="/admin" element={<Suspense fallback={<LoadingFallback />}><Admin /></Suspense>} />
+              <Route path="/classroom/:subjectId" element={<Suspense fallback={<LoadingFallback />}><ClassroomRoom /></Suspense>} />
+              <Route path="/clubs" element={<Suspense fallback={<LoadingFallback />}><Clubs /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

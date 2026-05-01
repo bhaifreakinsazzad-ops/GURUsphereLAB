@@ -11,6 +11,7 @@ const navItems = [
   { label: "Projects", href: "/team-projects", route: true },
   { label: "Mentors", href: "/mentorship", route: true },
   { label: "Hadi Meter", href: "/hadi-meter", route: true },
+  { label: "Clubs", href: "/clubs", route: true },
   { label: "Memorial", href: "/#memorial", route: false },
 ];
 

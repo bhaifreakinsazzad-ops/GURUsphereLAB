@@ -123,25 +123,30 @@ const OrbitNavbar = () => {
                 className="px-4 py-3 rounded-lg text-[15px] font-medium"
                 style={{ color: "hsl(var(--foreground))" }}
               >
-                {item.label}
+                {t(item.key)}
               </a>
             ))}
             <div style={{ height: 1, background: "hsl(var(--border))", margin: "0.5rem 0" }} />
             {user ? (
               <>
-                <Link to="/dashboard" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px] font-semibold" style={{ color: "hsl(var(--orbit-primary))" }}>
-                  Dashboard
+                <Link to="/my-learning" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px] font-semibold" style={{ color: "hsl(var(--orbit-primary))" }}>
+                  {t("nav.dashboard")}
                 </Link>
                 <button onClick={() => { setOpen(false); signOut(); }} className="text-left px-4 py-3 rounded-lg text-[15px]" style={{ color: "hsl(var(--foreground-muted))" }}>
-                  Sign out
+                  {t("nav.signout")}
                 </button>
               </>
             ) : (
-              <Link to="/auth" onClick={() => setOpen(false)} className="mx-2 my-2 orbit-btn orbit-btn-primary">
-                Start learning
-              </Link>
+              <>
+                <Link to="/login" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px]" style={{ color: "hsl(var(--foreground))" }}>
+                  {t("nav.signin")}
+                </Link>
+                <Link to="/signup" onClick={() => setOpen(false)} className="mx-2 my-2 orbit-btn orbit-btn-primary">
+                  {t("nav.start")}
+                </Link>
+              </>
             )}
-            <button className="px-4 py-3 text-left text-[13px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
+            <button onClick={toggleLang} className="px-4 py-3 text-left text-[13px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
               EN / বাংলা
             </button>
           </nav>

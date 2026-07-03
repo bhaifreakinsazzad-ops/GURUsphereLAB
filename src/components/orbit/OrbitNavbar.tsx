@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getLocale, setLocale, useT } from "@/lib/i18n";
 import OrbitGlyph from "./OrbitGlyph";
 
 const primary = [
-  { label: "Learn", href: "/#learn" },
-  { label: "Teach", href: "/#teach" },
-  { label: "Mentors", href: "/mentorship" },
-  { label: "Community", href: "/#community" },
+  { key: "nav.learn", href: "/discover" },
+  { key: "nav.teach", href: "/#teach" },
+  { key: "nav.mentors", href: "/mentorship" },
+  { key: "nav.community", href: "/#community" },
 ];
 
 const OrbitNavbar = () => {

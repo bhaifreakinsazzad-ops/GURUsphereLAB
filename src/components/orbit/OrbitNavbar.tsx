@@ -16,6 +16,9 @@ const OrbitNavbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, signOut } = useAuth();
+  const t = useT();
+
+  const toggleLang = () => setLocale(getLocale() === "en" ? "bn" : "en");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);

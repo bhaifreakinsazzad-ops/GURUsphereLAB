@@ -1,46 +1,66 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, Clock } from "lucide-react";
 import OrbitNavbar from "@/components/orbit/OrbitNavbar";
 import OrbitFooter from "@/components/orbit/OrbitFooter";
+import { fetchPublishedCourses, fetchSubjects, type CourseCard, type SubjectRow, type Difficulty } from "@/lib/learning";
 
-// Seed catalogue — replaced by server-side data in a later phase.
-const CATALOGUE = [
-  { title: "IELTS Band 7+", subject: "Languages", level: "Intermediate", weeks: 8, tags: ["ielts", "english", "language", "exam", "speaking"] },
-  { title: "Become a Web Developer", subject: "Programming", level: "Beginner", weeks: 12, tags: ["web", "html", "css", "javascript", "react", "developer"] },
-  { title: "Freelancing on Fiverr & Upwork", subject: "Career", level: "Beginner", weeks: 6, tags: ["freelance", "fiverr", "upwork", "career", "income"] },
-  { title: "AI Tools for Everyday Work", subject: "AI & Data", level: "All levels", weeks: 4, tags: ["ai", "chatgpt", "claude", "productivity", "tools"] },
-  { title: "English Speaking Fluency", subject: "Languages", level: "Beginner", weeks: 10, tags: ["english", "speaking", "language"] },
-  { title: "University Admission Prep (BD)", subject: "Career", level: "Intermediate", weeks: 14, tags: ["university", "admission", "hsc"] },
-  { title: "Graphic Design Foundations", subject: "Design", level: "Beginner", weeks: 8, tags: ["design", "figma", "canva", "graphic"] },
-  { title: "Python for Data Analysis", subject: "AI & Data", level: "Intermediate", weeks: 10, tags: ["python", "data", "pandas"] },
+const DIFFICULTIES: (Difficulty | "all")[] = ["all", "beginner", "intermediate", "advanced"];
+const LANGS: { value: string; label: string }[] = [
+  { value: "all", label: "Any language" },
+  { value: "en", label: "English" },
+  { value: "bn", label: "বাংলা" },
 ];
-
-const score = (q: string, item: typeof CATALOGUE[number]) => {
-  if (!q) return 1;
-  const needle = q.toLowerCase();
-  const hay = [item.title, item.subject, ...item.tags].join(" ").toLowerCase();
-  if (hay.includes(needle)) return 10;
-  const words = needle.split(/\s+/).filter(Boolean);
-  return words.reduce((s, w) => s + (hay.includes(w) ? 1 : 0), 0);
-};
 
 const Discover = () => {
   const [params, setParams] = useSearchParams();
-  const initialQ = params.get("q") ?? params.get("subject") ?? "";
-  const [q, setQ] = useState(initialQ);
+  const q = params.get("q") ?? "";
+  const subject = params.get("subject") ?? "";
+  const difficulty = (params.get("level") as Difficulty | null) ?? "";
+  const language = params.get("lang") ?? "all";
+
+  const [inputQ, setInputQ] = useState(q);
+  const [subjects, setSubjects] = useState<SubjectRow[]>([]);
+  const [results, setResults] = useState<CourseCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => { setInputQ(q); }, [q]);
+  useEffect(() => { fetchSubjects().then(setSubjects).catch(() => {}); }, []);
 
   useEffect(() => {
     document.title = q ? `${q} · Discover — GURUsphere` : "Discover — GURUsphere";
-  }, [q]);
+    setLoading(true);
+    setError(null);
+    fetchPublishedCourses({
+      q,
+      subjectSlug: subject || undefined,
+      difficulty: (difficulty || undefined) as Difficulty | undefined,
+      language,
+      limit: 48,
+    })
+      .then(setResults)
+      .catch((e) => setError(e.message ?? "Something went wrong"))
+      .finally(() => setLoading(false));
+  }, [q, subject, difficulty, language]);
 
-  const results = useMemo(() => {
-    return CATALOGUE
-      .map((c) => ({ c, s: score(q, c) }))
-      .filter((r) => r.s > 0)
-      .sort((a, b) => b.s - a.s)
-      .map((r) => r.c);
-  }, [q]);
+  const setParam = (key: string, value: string) => {
+    const next = new URLSearchParams(params);
+    if (value && value !== "all") next.set(key, value); else next.delete(key);
+    setParams(next);
+  };
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setParam("q", inputQ.trim());
+  };
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    background: active ? "hsl(var(--orbit-primary))" : "hsl(var(--surface))",
+    color: active ? "hsl(var(--orbit-on-primary))" : "hsl(var(--foreground))",
+    border: `1px solid ${active ? "hsl(var(--orbit-primary))" : "hsl(var(--border-strong))"}`,
+    minHeight: 32, padding: "0 0.75rem", fontSize: 12,
+  });
 
   return (
     <div className="orbit min-h-screen flex flex-col">
@@ -52,49 +72,84 @@ const Discover = () => {
           </Link>
 
           <div className="orbit-eyebrow mb-3">Discover</div>
-          <h1 className="text-[clamp(1.75rem,3.5vw,2.75rem)] leading-tight mb-8">
+          <h1 className="text-[clamp(1.75rem,3.5vw,2.75rem)] leading-tight mb-8" style={{ fontFamily: "'Fraunces', serif", color: "hsl(var(--foreground))" }}>
             {q ? <>Results for "<span style={{ color: "hsl(var(--orbit-accent))" }}>{q}</span>"</> : "Explore learning"}
           </h1>
 
-          <div className="mb-10 max-w-[640px]">
-            <div
-              className="flex items-center gap-2 pl-4 pr-2 py-2 rounded-xl"
-              style={{ background: "hsl(var(--surface))", border: "1px solid hsl(var(--border-strong))" }}
-            >
+          <form onSubmit={submitSearch} className="mb-6 max-w-[640px]">
+            <div className="flex items-center gap-2 pl-4 pr-2 py-2 rounded-xl"
+              style={{ background: "hsl(var(--surface))", border: "1px solid hsl(var(--border-strong))" }}>
               <Search size={18} style={{ color: "hsl(var(--foreground-subtle))" }} />
               <input
-                aria-label="Refine your search"
-                value={q}
-                onChange={(e) => { setQ(e.target.value); setParams(e.target.value ? { q: e.target.value } : {}); }}
-                placeholder="Refine your goal or subject"
+                aria-label="Search courses"
+                value={inputQ}
+                onChange={(e) => setInputQ(e.target.value)}
+                placeholder="Search a goal, skill, or subject"
                 className="flex-1 bg-transparent outline-none py-2.5 text-[15px]"
                 style={{ color: "hsl(var(--foreground))" }}
               />
+              <button type="submit" className="orbit-btn orbit-btn-primary" style={{ minHeight: 36 }}>Search</button>
             </div>
+          </form>
+
+          <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Subject filters">
+            <button onClick={() => setParam("subject", "")} className="orbit-btn" style={chip(!subject)}>All subjects</button>
+            {subjects.map((s) => (
+              <button key={s.id} onClick={() => setParam("subject", s.slug)} className="orbit-btn" style={chip(subject === s.slug)}>{s.name}</button>
+            ))}
           </div>
 
-          {results.length === 0 ? (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {DIFFICULTIES.map((d) => (
+              <button key={d} onClick={() => setParam("level", d)} className="orbit-btn" style={chip((difficulty || "all") === d)}>
+                {d === "all" ? "Any level" : d.charAt(0).toUpperCase() + d.slice(1)}
+              </button>
+            ))}
+            <div style={{ width: 1, background: "hsl(var(--border))", margin: "0 0.25rem" }} />
+            {LANGS.map((l) => (
+              <button key={l.value} onClick={() => setParam("lang", l.value)} className="orbit-btn" style={chip((language || "all") === l.value)}>
+                {l.label}
+              </button>
+            ))}
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="orbit-card p-6" style={{ minHeight: 180, opacity: 0.5 }}>
+                  <div style={{ height: 12, width: 80, background: "hsl(var(--surface-raised))", borderRadius: 4, marginBottom: 12 }} />
+                  <div style={{ height: 20, width: "80%", background: "hsl(var(--surface-raised))", borderRadius: 4, marginBottom: 8 }} />
+                  <div style={{ height: 14, width: "60%", background: "hsl(var(--surface-raised))", borderRadius: 4 }} />
+                </div>
+              ))}
+            </div>
+          ) : error ? (
             <div className="orbit-card p-10 text-center">
-              <p className="text-[16px] mb-2" style={{ color: "hsl(var(--foreground))" }}>
-                Nothing matches yet.
-              </p>
-              <p className="text-[14px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
-                Try a broader keyword — "english", "web", "freelance", "ai".
-              </p>
+              <p style={{ color: "hsl(var(--foreground))" }}>Couldn't load courses.</p>
+              <p className="text-[13px] mt-1" style={{ color: "hsl(var(--foreground-subtle))" }}>{error}</p>
+            </div>
+          ) : results.length === 0 ? (
+            <div className="orbit-card p-10 text-center">
+              <p className="text-[16px] mb-2" style={{ color: "hsl(var(--foreground))" }}>Nothing matches yet.</p>
+              <p className="text-[14px]" style={{ color: "hsl(var(--foreground-subtle))" }}>Try broader keywords or clear the filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {results.map((r) => (
-                <article key={r.title} className="orbit-card p-6">
-                  <div className="orbit-eyebrow mb-3" style={{ color: "hsl(var(--orbit-accent))" }}>{r.subject}</div>
-                  <h2 className="text-[1.125rem] mb-3" style={{ fontWeight: 600 }}>{r.title}</h2>
-                  <div className="flex items-center gap-4 text-[12px] mb-5" style={{ color: "hsl(var(--foreground-subtle))" }}>
-                    <span>{r.weeks} weeks</span>
+                <Link key={r.id} to={`/courses/${r.slug}`} className="orbit-card p-6 block">
+                  {r.subject && <div className="orbit-eyebrow mb-2" style={{ color: "hsl(var(--orbit-accent))" }}>{r.subject.name}</div>}
+                  <h2 className="text-[1.0625rem] mb-2" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>{r.title}</h2>
+                  {r.short_description && (
+                    <p className="text-[13px] mb-4 line-clamp-2" style={{ color: "hsl(var(--foreground-subtle))" }}>{r.short_description}</p>
+                  )}
+                  <div className="flex items-center gap-3 text-[12px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
+                    <span className="flex items-center gap-1"><Clock size={12} />{Math.round(r.estimated_minutes / 60) || 1}h</span>
                     <span>·</span>
-                    <span>{r.level}</span>
+                    <span className="capitalize">{r.difficulty}</span>
+                    <span>·</span>
+                    <span>{r.language === "bn" ? "বাংলা" : r.language === "both" ? "EN+বাংলা" : "English"}</span>
                   </div>
-                  <button className="orbit-btn orbit-btn-secondary w-full" type="button">Preview path</button>
-                </article>
+                </Link>
               ))}
             </div>
           )}

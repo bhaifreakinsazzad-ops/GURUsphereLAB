@@ -2,19 +2,23 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getLocale, setLocale, useT } from "@/lib/i18n";
 import OrbitGlyph from "./OrbitGlyph";
 
 const primary = [
-  { label: "Learn", href: "/#learn" },
-  { label: "Teach", href: "/#teach" },
-  { label: "Mentors", href: "/mentorship" },
-  { label: "Community", href: "/#community" },
+  { key: "nav.learn", href: "/discover" },
+  { key: "nav.teach", href: "/#teach" },
+  { key: "nav.mentors", href: "/mentorship" },
+  { key: "nav.community", href: "/#community" },
 ];
 
 const OrbitNavbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, signOut } = useAuth();
+  const t = useT();
+
+  const toggleLang = () => setLocale(getLocale() === "en" ? "bn" : "en");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -58,13 +62,14 @@ const OrbitNavbar = () => {
               onMouseEnter={(e) => (e.currentTarget.style.color = "hsl(var(--foreground))")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "hsl(var(--foreground-muted))")}
             >
-              {item.label}
+              {t(item.key)}
             </a>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
           <button
+            onClick={toggleLang}
             className="orbit-btn-ghost orbit-btn"
             style={{ minHeight: 36, padding: "0 0.75rem", fontSize: "0.8125rem" }}
             aria-label="Switch language"
@@ -74,17 +79,22 @@ const OrbitNavbar = () => {
           </button>
           {user ? (
             <>
-              <Link to="/dashboard" className="orbit-btn orbit-btn-secondary" style={{ minHeight: 40 }}>
-                Dashboard
+              <Link to="/my-learning" className="orbit-btn orbit-btn-secondary" style={{ minHeight: 40 }}>
+                {t("nav.dashboard")}
               </Link>
-              <button onClick={signOut} className="orbit-btn orbit-btn-ghost" aria-label="Sign out" style={{ minHeight: 40, padding: "0 0.75rem" }}>
+              <button onClick={signOut} className="orbit-btn orbit-btn-ghost" aria-label={t("nav.signout")} style={{ minHeight: 40, padding: "0 0.75rem" }}>
                 <LogOut size={16} />
               </button>
             </>
           ) : (
-            <Link to="/auth" className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
-              Start learning
-            </Link>
+            <>
+              <Link to="/login" className="orbit-btn orbit-btn-ghost" style={{ minHeight: 40 }}>
+                {t("nav.signin")}
+              </Link>
+              <Link to="/signup" className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
+                {t("nav.start")}
+              </Link>
+            </>
           )}
         </div>
 
@@ -113,25 +123,30 @@ const OrbitNavbar = () => {
                 className="px-4 py-3 rounded-lg text-[15px] font-medium"
                 style={{ color: "hsl(var(--foreground))" }}
               >
-                {item.label}
+                {t(item.key)}
               </a>
             ))}
             <div style={{ height: 1, background: "hsl(var(--border))", margin: "0.5rem 0" }} />
             {user ? (
               <>
-                <Link to="/dashboard" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px] font-semibold" style={{ color: "hsl(var(--orbit-primary))" }}>
-                  Dashboard
+                <Link to="/my-learning" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px] font-semibold" style={{ color: "hsl(var(--orbit-primary))" }}>
+                  {t("nav.dashboard")}
                 </Link>
                 <button onClick={() => { setOpen(false); signOut(); }} className="text-left px-4 py-3 rounded-lg text-[15px]" style={{ color: "hsl(var(--foreground-muted))" }}>
-                  Sign out
+                  {t("nav.signout")}
                 </button>
               </>
             ) : (
-              <Link to="/auth" onClick={() => setOpen(false)} className="mx-2 my-2 orbit-btn orbit-btn-primary">
-                Start learning
-              </Link>
+              <>
+                <Link to="/login" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg text-[15px]" style={{ color: "hsl(var(--foreground))" }}>
+                  {t("nav.signin")}
+                </Link>
+                <Link to="/signup" onClick={() => setOpen(false)} className="mx-2 my-2 orbit-btn orbit-btn-primary">
+                  {t("nav.start")}
+                </Link>
+              </>
             )}
-            <button className="px-4 py-3 text-left text-[13px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
+            <button onClick={toggleLang} className="px-4 py-3 text-left text-[13px]" style={{ color: "hsl(var(--foreground-subtle))" }}>
               EN / বাংলা
             </button>
           </nav>

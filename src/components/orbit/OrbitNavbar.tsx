@@ -62,13 +62,14 @@ const OrbitNavbar = () => {
               onMouseEnter={(e) => (e.currentTarget.style.color = "hsl(var(--foreground))")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "hsl(var(--foreground-muted))")}
             >
-              {item.label}
+              {t(item.key)}
             </a>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
           <button
+            onClick={toggleLang}
             className="orbit-btn-ghost orbit-btn"
             style={{ minHeight: 36, padding: "0 0.75rem", fontSize: "0.8125rem" }}
             aria-label="Switch language"
@@ -78,17 +79,22 @@ const OrbitNavbar = () => {
           </button>
           {user ? (
             <>
-              <Link to="/dashboard" className="orbit-btn orbit-btn-secondary" style={{ minHeight: 40 }}>
-                Dashboard
+              <Link to="/my-learning" className="orbit-btn orbit-btn-secondary" style={{ minHeight: 40 }}>
+                {t("nav.dashboard")}
               </Link>
-              <button onClick={signOut} className="orbit-btn orbit-btn-ghost" aria-label="Sign out" style={{ minHeight: 40, padding: "0 0.75rem" }}>
+              <button onClick={signOut} className="orbit-btn orbit-btn-ghost" aria-label={t("nav.signout")} style={{ minHeight: 40, padding: "0 0.75rem" }}>
                 <LogOut size={16} />
               </button>
             </>
           ) : (
-            <Link to="/auth" className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
-              Start learning
-            </Link>
+            <>
+              <Link to="/login" className="orbit-btn orbit-btn-ghost" style={{ minHeight: 40 }}>
+                {t("nav.signin")}
+              </Link>
+              <Link to="/signup" className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
+                {t("nav.start")}
+              </Link>
+            </>
           )}
         </div>
 

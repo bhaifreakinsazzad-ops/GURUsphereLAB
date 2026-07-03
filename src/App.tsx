@@ -7,11 +7,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioProvider } from "@/contexts/AudioContext";
 import AudioToggle from "@/components/AudioToggle";
-import FloatingDonateCTA from "@/components/FloatingDonateCTA";
-import Index from "./pages/Index.tsx";
+import Home from "./pages/Home.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Auth from "./pages/Auth.tsx";
 
+const Legacy = lazy(() => import("./pages/Index.tsx"));
+const Discover = lazy(() => import("./pages/Discover.tsx"));
 const ExamArena = lazy(() => import("./pages/ExamArena.tsx"));
 const HadiMeter = lazy(() => import("./pages/HadiMeter.tsx"));
 const ResearchArchive = lazy(() => import("./pages/ResearchArchive.tsx"));
@@ -25,10 +26,12 @@ const Clubs = lazy(() => import("./pages/Clubs.tsx"));
 const queryClient = new QueryClient();
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center hero-gradient">
+  <div className="min-h-screen flex items-center justify-center" style={{ background: "hsl(224 30% 6%)" }}>
     <div className="text-center">
-      <div className="text-3xl font-bold mb-2"><span className="text-gradient-gold">Hadi</span> <span className="text-gradient-green">Wishes</span></div>
-      <p className="text-sm" style={{ color: "hsl(162 20% 55%)" }}>Loading...</p>
+      <div className="text-2xl font-medium mb-2" style={{ fontFamily: "'Fraunces', serif", color: "hsl(40 20% 96%)" }}>
+        GURU<span style={{ fontStyle: "italic", color: "hsl(168 72% 48%)" }}>sphere</span>
+      </div>
+      <p className="text-sm" style={{ color: "hsl(40 10% 68%)" }}>Loading…</p>
     </div>
   </div>
 );
@@ -42,9 +45,10 @@ const App = () => (
         <AuthProvider>
           <AudioProvider>
             <AudioToggle />
-            <FloatingDonateCTA />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/legacy" element={<Suspense fallback={<LoadingFallback />}><Legacy /></Suspense>} />
+              <Route path="/discover" element={<Suspense fallback={<LoadingFallback />}><Discover /></Suspense>} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/exam-arena" element={<Suspense fallback={<LoadingFallback />}><ExamArena /></Suspense>} />
               <Route path="/hadi-meter" element={<Suspense fallback={<LoadingFallback />}><HadiMeter /></Suspense>} />

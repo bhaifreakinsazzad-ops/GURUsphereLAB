@@ -7,7 +7,7 @@ import OrbitGlyph from "./OrbitGlyph";
 
 const primary = [
   { key: "nav.learn", href: "/discover" },
-  { key: "nav.teach", href: "/#teach" },
+  { key: "nav.teach", href: "/teach/apply" },
   { key: "nav.mentors", href: "/mentorship" },
   { key: "nav.community", href: "/#community" },
 ];

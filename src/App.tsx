@@ -30,6 +30,9 @@ const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const ClassroomRoom = lazy(() => import("./pages/ClassroomRoom.tsx"));
 const Clubs = lazy(() => import("./pages/Clubs.tsx"));
+const TeachApply = lazy(() => import("./pages/TeachApply.tsx"));
+const EducatorWorkspace = lazy(() => import("./pages/EducatorWorkspace.tsx"));
+const CourseEditor = lazy(() => import("./pages/CourseEditor.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -88,6 +91,24 @@ const App = () => {
                   <ProtectedRoute><MyLearning /></ProtectedRoute>
                 </Suspense>
               } />
+
+              {/* Educator */}
+              <Route path="/teach/apply" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ProtectedRoute requireOnboarding={false}><TeachApply /></ProtectedRoute>
+                </Suspense>
+              } />
+              <Route path="/educator" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ProtectedRoute requireOnboarding={false}><EducatorWorkspace /></ProtectedRoute>
+                </Suspense>
+              } />
+              <Route path="/educator/courses/:id" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ProtectedRoute requireOnboarding={false}><CourseEditor /></ProtectedRoute>
+                </Suspense>
+              } />
+
 
               {/* Legacy memorial routes (untouched) */}
               <Route path="/exam-arena" element={<Suspense fallback={<LoadingFallback />}><ExamArena /></Suspense>} />

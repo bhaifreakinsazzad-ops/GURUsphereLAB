@@ -186,6 +186,63 @@ export type Database = {
         }
         Relationships: []
       }
+      educator_applications: {
+        Row: {
+          created_at: string
+          credentials: string
+          expertise: string[]
+          full_name: string
+          headline: string
+          id: string
+          languages: string[]
+          linkedin_url: string | null
+          motivation: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          sample_work_url: string | null
+          status: Database["public"]["Enums"]["educator_application_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credentials: string
+          expertise?: string[]
+          full_name: string
+          headline: string
+          id?: string
+          languages?: string[]
+          linkedin_url?: string | null
+          motivation: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          sample_work_url?: string | null
+          status?: Database["public"]["Enums"]["educator_application_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credentials?: string
+          expertise?: string[]
+          full_name?: string
+          headline?: string
+          id?: string
+          languages?: string[]
+          linkedin_url?: string | null
+          motivation?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          sample_work_url?: string | null
+          status?: Database["public"]["Enums"]["educator_application_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           completed_at: string | null
@@ -760,6 +817,11 @@ export type Database = {
         | "archived"
         | "rejected"
       course_visibility: "public" | "unlisted" | "private"
+      educator_application_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "changes_requested"
       enrollment_status: "active" | "completed" | "dropped"
       lesson_status: "draft" | "ready" | "published" | "archived"
       lesson_type: "text" | "video" | "link" | "embed"
@@ -904,6 +966,12 @@ export const Constants = {
         "rejected",
       ],
       course_visibility: ["public", "unlisted", "private"],
+      educator_application_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "changes_requested",
+      ],
       enrollment_status: ["active", "completed", "dropped"],
       lesson_status: ["draft", "ready", "published", "archived"],
       lesson_type: ["text", "video", "link", "embed"],

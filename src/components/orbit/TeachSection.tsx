@@ -27,7 +27,7 @@ const TeachSection = () => (
             Whether you're a subject teacher, working professional, or self-taught expert — publish
             your first course free. Monetization for educators is coming after MVP.
           </p>
-          <Link to="/auth" className="orbit-btn orbit-btn-primary">
+          <Link to="/teach/apply" className="orbit-btn orbit-btn-primary">
             Become an educator <ArrowRight size={16} />
           </Link>
         </div>

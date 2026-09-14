@@ -1,0 +1,95 @@
+{
+  "exported_at": "2026-09-14T15:51:03.785Z",
+  "count": 3,
+  "courses": [
+    {
+      "id": "e6b63fd3-fde9-4013-86da-342512c55e53",
+      "slug": "digital-essentials-2026",
+      "title": "Digital Essentials for Everyone",
+      "title_bn": null,
+      "short_description": "Master the everyday digital tools that make modern work possible.",
+      "description": "A friendly, hands-on introduction to using the web, files, email, and productivity tools with confidence. No prior experience required.",
+      "difficulty": "beginner",
+      "language": "en",
+      "estimated_minutes": 180,
+      "estimated_hours": 3,
+      "thumbnail_url": null,
+      "subject_id": "00a0f908-6401-4251-9110-96b3f830711c",
+      "subject": {
+        "name": "Digital Skills",
+        "slug": "digital-skills",
+        "name_bn": "ডিজিটাল স্কিল"
+      },
+      "outcomes": [
+        "Navigate the web safely",
+        "Manage files and folders",
+        "Send professional emails",
+        "Use documents and spreadsheets"
+      ],
+      "prerequisites": [
+        "A computer or smartphone with internet"
+      ],
+      "published_at": "2026-07-03T15:18:53.605794+00:00",
+      "created_at": "2026-07-03T15:18:53.605794+00:00",
+      "updated_at": "2026-07-03T15:18:53.605794+00:00"
+    },
+    {
+      "id": "a85da725-620a-4c99-b8dd-38840b103351",
+      "slug": "english-for-work",
+      "title": "Everyday English for Work",
+      "title_bn": null,
+      "short_description": "Speak and write clearly in professional English situations.",
+      "description": "Practical English focused on the real situations you meet at work: introductions, emails, meetings, and interviews.",
+      "difficulty": "beginner",
+      "language": "en",
+      "estimated_minutes": 150,
+      "estimated_hours": 2.5,
+      "thumbnail_url": null,
+      "subject_id": "1a41476e-1ec1-4d03-b38d-217759ee9209",
+      "subject": {
+        "name": "English Communication",
+        "slug": "english-communication",
+        "name_bn": "ইংরেজি যোগাযোগ"
+      },
+      "outcomes": [
+        "Introduce yourself professionally",
+        "Write short, clear emails",
+        "Speak in meetings without freezing",
+        "Answer common interview questions"
+      ],
+      "prerequisites": [],
+      "published_at": "2026-07-03T15:18:53.605794+00:00",
+      "created_at": "2026-07-03T15:18:53.605794+00:00",
+      "updated_at": "2026-07-03T15:18:53.605794+00:00"
+    },
+    {
+      "id": "45a8fb35-11bb-4109-a09d-9ae8a512d497",
+      "slug": "start-small-business",
+      "title": "Start a Small Business This Month",
+      "title_bn": null,
+      "short_description": "A practical starter kit for launching a small local or online business.",
+      "description": "A no-fluff guide to picking an idea, testing it with real people, taking your first orders, and getting paid.",
+      "difficulty": "beginner",
+      "language": "en",
+      "estimated_minutes": 210,
+      "estimated_hours": 3.5,
+      "thumbnail_url": null,
+      "subject_id": "454ed410-47ca-40ff-85fb-21e6706a763b",
+      "subject": {
+        "name": "Entrepreneurship",
+        "slug": "entrepreneurship",
+        "name_bn": "উদ্যোক্তা"
+      },
+      "outcomes": [
+        "Pick a real, testable idea",
+        "Talk to 5 potential customers",
+        "Take your first order",
+        "Set up simple bookkeeping"
+      ],
+      "prerequisites": [],
+      "published_at": "2026-07-03T15:18:53.605794+00:00",
+      "created_at": "2026-07-03T15:18:53.605794+00:00",
+      "updated_at": "2026-07-03T15:18:53.605794+00:00"
+    }
+  ]
+}

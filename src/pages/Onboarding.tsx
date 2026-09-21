@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { completeOnboarding, getPreferences, savePreferences } from "@/lib/preferences";
 import { fetchSubjects, type SubjectRow } from "@/lib/learning";
-import { setLocale } from "@/lib/i18n";
+import { setLocale, useT } from "@/lib/i18n";
 import { toast } from "@/hooks/use-toast";
 import OrbitGlyph from "@/components/orbit/OrbitGlyph";
 
@@ -19,6 +19,7 @@ const styles = [
 const Onboarding = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const t = useT();
   const [subjects, setSubjects] = useState<SubjectRow[]>([]);
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -82,8 +83,8 @@ const Onboarding = () => {
       } else {
         await savePreferences(user.id, patch);
       }
-    } catch (e: any) {
-      toast({ title: "Couldn't save", description: e.message ?? String(e), variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Couldn't save", description: e instanceof Error ? e.message : String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -125,7 +126,7 @@ const Onboarding = () => {
             <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>GURUsphere</span>
           </div>
           <button onClick={skip} disabled={saving} className="orbit-btn orbit-btn-ghost text-[13px]" style={{ minHeight: 32, padding: "0 0.75rem" }}>
-            Skip for now
+            {t("onboarding.skip")}
           </button>
         </div>
 
@@ -134,15 +135,15 @@ const Onboarding = () => {
         </div>
 
         <div className="orbit-card p-8">
-          <div className="orbit-eyebrow mb-3">Step {step} of {totalSteps}</div>
+          <div className="orbit-eyebrow mb-3">{t("onboarding.step")} {step} {t("onboarding.of")} {totalSteps}</div>
 
           {step === 1 && (
             <>
               <h1 className="text-[1.75rem] mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>
-                What do you want to learn or become?
+                {t("onboarding.goal")}
               </h1>
               <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>
-                One sentence is enough. We'll refine as we go.
+                {t("onboarding.goal_hint")}
               </p>
               <textarea
                 value={goal}
@@ -159,9 +160,9 @@ const Onboarding = () => {
           {step === 2 && (
             <>
               <h1 className="text-[1.75rem] mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>
-                Which subjects interest you?
+                {t("onboarding.subjects")}
               </h1>
-              <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>Pick as many as you like.</p>
+              <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>{t("onboarding.subjects_hint")}</p>
               <div className="flex flex-wrap gap-2">
                 {subjects.map((s) => {
                   const active = interests.includes(s.slug);
@@ -185,9 +186,9 @@ const Onboarding = () => {
           {step === 3 && (
             <>
               <h1 className="text-[1.75rem] mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>
-                Where are you starting?
+                {t("onboarding.level")}
               </h1>
-              <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>Be honest — we'll match courses to fit.</p>
+              <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>{t("onboarding.level_hint")}</p>
               <div className="grid grid-cols-2 gap-2">
                 {(["beginner","intermediate","advanced","unsure"] as const).map((l) => {
                   const active = level === l;
@@ -210,7 +211,7 @@ const Onboarding = () => {
           {step === 4 && (
             <>
               <h1 className="text-[1.75rem] mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>
-                How do you like to learn?
+                {t("onboarding.style")}
               </h1>
               <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>Pick the option that fits you best today.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
@@ -242,7 +243,7 @@ const Onboarding = () => {
           {step === 5 && (
             <>
               <h1 className="text-[1.75rem] mb-2" style={{ fontFamily: "'Fraunces', serif", fontWeight: 500, color: "hsl(var(--foreground))" }}>
-                Preferred language & goal
+                {t("onboarding.language")}
               </h1>
               <p className="text-[14px] mb-6" style={{ color: "hsl(var(--foreground-subtle))" }}>You can change these anytime.</p>
               <label className="block text-[12px] mb-2" style={{ color: "hsl(var(--foreground-muted))" }}>Interface language</label>
@@ -273,14 +274,14 @@ const Onboarding = () => {
 
           <div className="flex items-center justify-between mt-8 pt-6" style={{ borderTop: "1px solid hsl(var(--border))" }}>
             <button onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1 || saving}
-              className="orbit-btn orbit-btn-ghost" style={{ minHeight: 40 }}>Back</button>
+              className="orbit-btn orbit-btn-ghost" style={{ minHeight: 40 }}>{t("onboarding.back")}</button>
             {step < totalSteps ? (
               <button onClick={() => setStep((s) => s + 1)} disabled={!canNext || saving} className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
-                Next
+                {t("onboarding.next")}
               </button>
             ) : (
               <button onClick={() => persist(true)} disabled={saving} className="orbit-btn orbit-btn-primary" style={{ minHeight: 40 }}>
-                {saving ? "Saving…" : "Finish and explore"}
+                {saving ? t("common.loading") : t("onboarding.finish")}
               </button>
             )}
           </div>

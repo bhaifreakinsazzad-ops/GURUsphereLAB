@@ -60,12 +60,12 @@ const LessonViewer = () => {
     if (!user || !current || !courseId) { navigate(`/login?redirect=/learn/${courseId}/lessons/${lessonId}`); return; }
     setSaving(true);
     try {
-      await upsertLessonProgress(user.id, courseId, current.id, true);
+      const result = await upsertLessonProgress(courseId, current.id, true);
       setCompleted((s) => new Set(s).add(current.id));
-      toast({ title: "Marked complete" });
+      toast({ title: result.course_completed ? "Course completed" : "Marked complete", description: result.course_completed ? "Your completion record is ready for certification." : undefined });
       if (next) navigate(`/learn/${courseId}/lessons/${next.id}`);
-    } catch (e: any) {
-      toast({ title: "Couldn't save progress", description: e.message, variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Couldn't save progress", description: e instanceof Error ? e.message : "Please try again.", variant: "destructive" });
     } finally { setSaving(false); }
   };
 

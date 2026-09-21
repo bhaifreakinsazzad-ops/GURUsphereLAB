@@ -30,4 +30,9 @@ test.describe("GURUsphere learner core flows", () => {
     await expect(page).toHaveURL(/\/courses\/digital-essentials-2026$/);
     await expect(page.locator("body")).toContainText(/Enroll|Course not found|Loading course/i);
   });
+
+  test("assessment route is protected for anonymous visitors", async ({ page }) => {
+    await page.goto("/learn/8c0ff1b8-58d8-4a56-b495-94a86aeafdda/assessment/91dc73e8-2c99-44e1-b408-65f2f732da10");
+    await expect(page).toHaveURL(/\/login\?redirect=%2Flearn%2F8c0ff1b8-58d8-4a56-b495-94a86aeafdda%2Fassessment%2F91dc73e8-2c99-44e1-b408-65f2f732da10/);
+  });
 });

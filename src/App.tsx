@@ -33,6 +33,7 @@ const Clubs = lazy(() => import("./pages/Clubs.tsx"));
 const TeachApply = lazy(() => import("./pages/TeachApply.tsx"));
 const EducatorWorkspace = lazy(() => import("./pages/EducatorWorkspace.tsx"));
 const CourseEditor = lazy(() => import("./pages/CourseEditor.tsx"));
+const Assessment = lazy(() => import("./pages/Assessment.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,11 @@ const App = () => {
               <Route path="/learn/:courseId/lessons/:lessonId" element={
                 <Suspense fallback={<LoadingFallback />}>
                   <ProtectedRoute><LessonViewer /></ProtectedRoute>
+                </Suspense>
+              } />
+              <Route path="/learn/:courseId/assessment/:assessmentId" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ProtectedRoute><Assessment /></ProtectedRoute>
                 </Suspense>
               } />
               <Route path="/my-learning" element={

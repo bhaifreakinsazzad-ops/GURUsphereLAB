@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Clock, CheckCircle2, ChevronRight, Sparkles } from "lucide-react";
 import OrbitNavbar from "@/components/orbit/OrbitNavbar";
 import OrbitFooter from "@/components/orbit/OrbitFooter";
-import { fetchCourseBySlug, enrollInCourse, getEnrollment, fetchCourseProgress, type CourseDetail, type ModuleWithLessons } from "@/lib/learning";
+import { fetchCourseBySlug, enrollInCourse, getEnrollment, fetchCourseProgress, fetchAssessmentsForCourse, type Assessment, type CourseDetail, type ModuleWithLessons } from "@/lib/learning";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -19,6 +19,7 @@ const CourseDetailPage = () => {
   const [enrolled, setEnrolled] = useState(false);
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
   const [enrolling, setEnrolling] = useState(false);
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
 
   useEffect(() => {
     if (!slug) return;
@@ -27,6 +28,7 @@ const CourseDetailPage = () => {
       if (!result) { setNotFound(true); return; }
       setCourse(result.course);
       setModules(result.modules);
+      fetchAssessmentsForCourse(result.course.id).then(setAssessments).catch(() => setAssessments([]));
       document.title = `${result.course.title} — GURUsphere`;
     }).catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -52,8 +54,8 @@ const CourseDetailPage = () => {
       setEnrolled(true);
       toast({ title: "You're enrolled", description: "Start with the first lesson." });
       if (firstLesson) navigate(`/learn/${course.id}/lessons/${firstLesson.id}`);
-    } catch (e: any) {
-      toast({ title: "Couldn't enroll", description: e.message, variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Couldn't enroll", description: e instanceof Error ? e.message : "Please try again.", variant: "destructive" });
     } finally { setEnrolling(false); }
   };
 
@@ -178,6 +180,19 @@ const CourseDetailPage = () => {
                 )}
               </div>
             </section>
+            {enrolled && assessments.length > 0 && (
+              <section className="mt-10">
+                <h2 className="text-[1.25rem] mb-4" style={{ fontFamily: "'Fraunces', serif", color: "hsl(var(--foreground))" }}>Practice & feedback</h2>
+                <div className="space-y-3">
+                  {assessments.map((assessment) => (
+                    <Link key={assessment.id} to={`/learn/${course.id}/assessment/${assessment.id}`} className="orbit-card p-5 flex items-center justify-between gap-4">
+                      <div><h3 className="text-[15px]" style={{ color: "hsl(var(--foreground))" }}>{assessment.title}</h3><p className="text-[13px] mt-1" style={{ color: "hsl(var(--foreground-subtle))" }}>{assessment.questions.length} questions · Pass mark {assessment.passing_score}%</p></div>
+                      <ChevronRight size={16} style={{ color: "hsl(var(--orbit-primary))" }} />
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           <aside>
